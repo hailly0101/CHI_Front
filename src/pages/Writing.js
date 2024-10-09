@@ -403,7 +403,7 @@ function Writing(props) {
 
 
     function requestPrompt(text, user, num, turn, module, model) {
-        return fetch('http://127.0.0.1:8000/chat/standalone', {
+        return fetch('https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/chat/standalone', {
             method: 'POST',
             body: JSON.stringify({
                 'text': text,
@@ -573,7 +573,7 @@ function Writing(props) {
 
 
     function diaryInit(text, user, num) {
-        return fetch('http://127.0.0.1:8000/chat/diary', {
+        return fetch('https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/chat/diary', {
             method: 'POST',
             body: JSON.stringify({
                 'text': text,
@@ -589,7 +589,7 @@ function Writing(props) {
     const subject = '[마음챙김]' + props.userMail + '새로운 일기 작성 ';
     const body = '새로운 일기가 작성됨. 사용자id: ' + props.userMail;
 
-    fetch('http://127.0.0.1:8000/chat/send-email', {
+    fetch('https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/chat/send-email', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
