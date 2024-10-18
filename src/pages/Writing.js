@@ -68,6 +68,19 @@ function Writing(props) {
     const phq9 = useRef(null)
     let [phqTotal, setPhqTotal] = useState(null)
 
+    const [counselorDiagnosis, setCounselorDiagnosis] = useState(''); // 상담사 모델 진단 상태
+    const [doctorDiagnosis, setDoctorDiagnosis] = useState(''); // 의사 모델 진단 상태
+    const [pocketMindDiagnosis, setPocketMindDiagnosis] = useState(''); // Pocket-mind 진단 상태
+    const [showDiagnosisModal, setShowDiagnosisModal] = useState(false);  // 모달 열기/닫기 상태
+
+    // 모달 열기/닫기 함수
+    const handleShowDiagnosisModal = () => setShowDiagnosisModal(true);
+    const handleCloseDiagnosisModal = () => setShowDiagnosisModal(false);
+
+    // const [counselorResponse, setCounselorResponse] = useState(''); // 상담사 답변 기록
+    // const [doctorResponse, setDoctorResponse] = useState(''); // 의사 답변 기록
+    // const [pocketMindResponse, setPocketMindResponse] = useState(''); // Pocket-mind 답변 기록
+
     // voice input feature
     useEffect(() => {
         if (!('webkitSpeechRecognition' in window)) {
@@ -277,6 +290,20 @@ function Writing(props) {
             diary: diary
         }, {merge: true});
         // navigateToReview()
+
+        // 각 진단 요청을 수행하고 결과를 변수에 저장
+        const counselorDiagnosis = await requestCounselorDiagnosis(diary);
+        const doctorDiagnosis = await requestDoctorDiagnosis(diary);
+        const pocketMindDiagnosis = await requestPocketMindDiagnosis(diary);
+
+        // 진단 결과를 Firebase에 업데이트
+        await setDoc(doc(db, "session", props.userMail, "diary", session), {
+            counselorDiagnosis: counselorDiagnosis,  // 상담사 진단 결과
+            doctorDiagnosis: doctorDiagnosis,        // 의사 진단 결과
+            pocketMindDiagnosis: pocketMindDiagnosis // Pocket-mind 진단 결과
+        }, {merge: true});
+
+
         setSurveyReady(true)
     }
 
@@ -416,6 +443,71 @@ function Writing(props) {
         })
             .catch(err => console.log(err));
     }
+
+    async function requestCounselorDiagnosis(diary) {
+        try {
+            const response = await fetch('https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/chat/counselor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    diary: diary,
+                }),
+            });
+            const data = await response.json();
+            setCounselorDiagnosis(data.diagnosis); // 상담사 진단 결과 저장
+        } catch (error) {
+            console.error('Error fetching counselor diagnosis:', error);
+            setCounselorDiagnosis('진단을 가져오는 중 오류가 발생했습니다.');
+        }
+    }
+
+    async function requestDoctorDiagnosis() {
+        try {
+            const response = await fetch('https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/chat/doctor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    diary: diary,
+                    conversation: conversation,
+                    user: props.userMail
+                }),
+            });
+            const data = await response.json();
+            setDoctorDiagnosis(data.diagnosis); // 의사 진단 결과 저장
+        } catch (error) {
+            console.error('Error fetching doctor diagnosis:', error);
+            setDoctorDiagnosis('진단을 가져오는 중 오류가 발생했습니다.');
+        }
+    }
+
+    async function requestPocketMindDiagnosis() {
+        try {
+            const response = await fetch('https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/chat/pocket', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    diary: diary,
+                    conversation: conversation,
+                    user: props.userMail
+                }),
+            });
+            const data = await response.json();
+            setPocketMindDiagnosis(data.diagnosis); // Pocket-mind 진단 결과 저장
+        } catch (error) {
+            console.error('Error fetching Pocket-mind diagnosis:', error);
+            setPocketMindDiagnosis('진단을 가져오는 중 오류가 발생했습니다.');
+        }
+    }
+    
+    
+
+
 
     function Unix_timestamp(t) {
         var date = new Date(t * 1000);
@@ -733,11 +825,13 @@ function Writing(props) {
                                 variant="primary"
                                 style={{backgroundColor: "007AFF", fontWeight: "600"}}
                                 onClick={() => {
-                                    endSession()
+                                    endSession();
+                                    handleShowDiagnosisModal();  // 모달 열기
                                 }}
                             >👍 오늘의 일기쓰기 완료!
                     </Button>
                         </span>
+
 
                         <span className="smartphone-view-text">
                          <b>🗓️ 오늘의 일기<br/></b>
@@ -746,14 +840,59 @@ function Writing(props) {
                                 variant="primary"
                                 style={{backgroundColor: "007AFF", fontWeight: "600"}}
                                 onClick={() => {
-                                    endSession()
+                                    endSession();
+                                    handleShowDiagnosisModal();  // 모달 열기
                                 }}
                             >👍 오늘의 일기쓰기 완료!
                     </Button>
                         </span>
 
                     </Row>
+                    <Modal show={showDiagnosisModal} onHide={handleCloseDiagnosisModal} centered>
+                        <Modal.Header closeButton>
+                            <Modal.Title>AI 진단 결과</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <Row>
+                                <span className="desktop-view">
+                                    <b>🧠 정신상담사 모델 진단<br/></b>
+                                    {counselorDiagnosis ? counselorDiagnosis : '진단을 준비중입니다...'}<br/><br/>
+                                </span>
 
+                                <span className="smartphone-view-text">
+                                    <b>🧠 정신상담사 모델 진단<br/></b>
+                                    {counselorDiagnosis ? counselorDiagnosis : '진단을 준비중입니다...'}<br/><br/>
+                                </span>
+
+                                {/* AI 진단 2: 정신과 의사 모델 */}
+                                <span className="desktop-view">
+                                    <b>🧠 정신과 의사 모델 진단<br/></b>
+                                    {doctorDiagnosis ? doctorDiagnosis : '진단을 준비중입니다...'}<br/><br/>
+                                </span>
+
+                                <span className="smartphone-view-text">
+                                    <b>🧠 정신과 의사 모델 진단<br/></b>
+                                    {doctorDiagnosis ? doctorDiagnosis : '진단을 준비중입니다...'}<br/><br/>
+                                </span>
+
+                                {/* AI 진단 3: Pocket-mind 자체 모델 */}
+                                <span className="desktop-view">
+                                    <b>🧠 Pocket-mind 모델 진단<br/></b>
+                                    {pocketMindDiagnosis ? pocketMindDiagnosis : '진단을 준비중입니다...'}<br/><br/>
+                                </span>
+
+                                <span className="smartphone-view-text">
+                                    <b>🧠 Pocket-mind 모델 진단<br/></b>
+                                    {pocketMindDiagnosis ? pocketMindDiagnosis : '진단을 준비중입니다...'}<br/><br/>
+                                </span>
+                            </Row>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={handleCloseDiagnosisModal}>
+                                닫기
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
 
                 </Container>
             )
