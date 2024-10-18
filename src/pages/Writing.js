@@ -334,19 +334,6 @@ function Writing(props) {
         // 진단 결과 모달을 보여줌
         handleShowDiagnosisModal();
 
-        // 진단 모달을 닫은 후에 리뷰 페이지로 이동
-        // 모달이 닫힌 이후에 navigateToReview() 실행
-        await new Promise((resolve) => {
-            const checkModalClosed = setInterval(() => {
-                if (!showDiagnosisModal) {  // 모달이 닫히면
-                    clearInterval(checkModalClosed);  // 인터벌을 클리어하고
-                    resolve();  // Promise를 해결하여 다음 단계로 이동
-                }
-            }, 500);  // 500ms마다 모달 상태를 체크
-        });
-
-        // 리뷰 페이지로 이동
-        navigateToReview();
     }
 
     async function editDiary(diary_edit) {
