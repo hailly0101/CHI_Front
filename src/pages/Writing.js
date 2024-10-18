@@ -291,16 +291,18 @@ function Writing(props) {
         }, {merge: true});
         // navigateToReview()
 
-        // 각 진단 요청을 수행하고 결과를 변수에 저장
-        const counselorDiagnosis = await requestCounselorDiagnosis(diary);
-        const doctorDiagnosis = await requestDoctorDiagnosis(diary);
-        const pocketMindDiagnosis = await requestPocketMindDiagnosis(diary);
+        // 진단 요청들을 병렬로 실행
+        const [counselorDiagnosis, doctorDiagnosis, pocketMindDiagnosis] = await Promise.all([
+            requestCounselorDiagnosis(diary),
+            requestDoctorDiagnosis(diary),
+            requestPocketMindDiagnosis(diary)
+        ]);
 
         // 진단 결과를 Firebase에 업데이트
         await setDoc(doc(db, "session", props.userMail, "diary", session), {
-            counselorDiagnosis: counselorDiagnosis,  // 상담사 진단 결과
-            doctorDiagnosis: doctorDiagnosis,        // 의사 진단 결과
-            pocketMindDiagnosis: pocketMindDiagnosis // Pocket-mind 진단 결과
+            counselorDiagnosis: counselorDiagnosis || '진단 결과 없음',  // 상담사 진단 결과
+            doctorDiagnosis: doctorDiagnosis || '진단 결과 없음',        // 의사 진단 결과
+            pocketMindDiagnosis: pocketMindDiagnosis || '진단 결과 없음' // Pocket-mind 진단 결과
         }, {merge: true});
 
 
@@ -457,13 +459,14 @@ function Writing(props) {
             });
             const data = await response.json();
             setCounselorDiagnosis(data.diagnosis); // 상담사 진단 결과 저장
+            return data.diagnosis || '진단 결과 없음'; 
         } catch (error) {
             console.error('Error fetching counselor diagnosis:', error);
             setCounselorDiagnosis('진단을 가져오는 중 오류가 발생했습니다.');
         }
     }
 
-    async function requestDoctorDiagnosis() {
+    async function requestDoctorDiagnosis(diary) {
         try {
             const response = await fetch('https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/chat/doctor', {
                 method: 'POST',
@@ -472,19 +475,18 @@ function Writing(props) {
                 },
                 body: JSON.stringify({
                     diary: diary,
-                    conversation: conversation,
-                    user: props.userMail
                 }),
             });
             const data = await response.json();
-            setDoctorDiagnosis(data.diagnosis); // 의사 진단 결과 저장
+            setDoctorDiagnosis(data.diagnosis);
+            return data.diagnosis || '진단 결과 없음';  // 의사 진단 결과 저장
         } catch (error) {
             console.error('Error fetching doctor diagnosis:', error);
             setDoctorDiagnosis('진단을 가져오는 중 오류가 발생했습니다.');
         }
     }
 
-    async function requestPocketMindDiagnosis() {
+    async function requestPocketMindDiagnosis(diary) {
         try {
             const response = await fetch('https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/chat/pocket', {
                 method: 'POST',
@@ -493,12 +495,11 @@ function Writing(props) {
                 },
                 body: JSON.stringify({
                     diary: diary,
-                    conversation: conversation,
-                    user: props.userMail
                 }),
             });
             const data = await response.json();
             setPocketMindDiagnosis(data.diagnosis); // Pocket-mind 진단 결과 저장
+            return data.diagnosis || '진단 결과 없음'
         } catch (error) {
             console.error('Error fetching Pocket-mind diagnosis:', error);
             setPocketMindDiagnosis('진단을 가져오는 중 오류가 발생했습니다.');
