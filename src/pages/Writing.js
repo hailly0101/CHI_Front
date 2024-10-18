@@ -298,12 +298,12 @@ function Writing(props) {
             requestPocketMindDiagnosis(diary)
         ]);
 
-        // 진단 결과를 Firebase에 업데이트
-        await setDoc(doc(db, "session", props.userMail, "diary", session), {
-            counselorDiagnosis: counselorDiagnosis || '진단 결과 없음',  // 상담사 진단 결과
-            doctorDiagnosis: doctorDiagnosis || '진단 결과 없음',        // 의사 진단 결과
-            pocketMindDiagnosis: pocketMindDiagnosis || '진단 결과 없음' // Pocket-mind 진단 결과
-        }, {merge: true});
+        // // 진단 결과를 Firebase에 업데이트
+        // await setDoc(doc(db, "session", props.userMail, "diary", session), {
+        //     counselorDiagnosis: counselorDiagnosis || '진단 결과 없음',  // 상담사 진단 결과
+        //     doctorDiagnosis: doctorDiagnosis || '진단 결과 없음',        // 의사 진단 결과
+        //     pocketMindDiagnosis: pocketMindDiagnosis || '진단 결과 없음' // Pocket-mind 진단 결과
+        // }, {merge: true});
 
 
         setSurveyReady(true)
