@@ -75,7 +75,11 @@ function Writing(props) {
 
     // 모달 열기/닫기 함수
     const handleShowDiagnosisModal = () => setShowDiagnosisModal(true);
-    const handleCloseDiagnosisModal = () => setShowDiagnosisModal(false);
+    const handleCloseDiagnosisModal = () => {
+        setShowDiagnosisModal(false);
+        // 모달을 닫을 때 화면 전환을 처리
+        navigateToReview();  // 모달이 닫힌 후에 화면 이동
+    };
 
     // const [counselorResponse, setCounselorResponse] = useState(''); // 상담사 답변 기록
     // const [doctorResponse, setDoctorResponse] = useState(''); // 의사 답변 기록
@@ -327,7 +331,22 @@ function Writing(props) {
             phq9score: phqTotal,
             phq_item_score: [phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8, phq9]
         }, {merge: true});
-        navigateToReview()
+        // 진단 결과 모달을 보여줌
+        handleShowDiagnosisModal();
+
+        // 진단 모달을 닫은 후에 리뷰 페이지로 이동
+        // 모달이 닫힌 이후에 navigateToReview() 실행
+        await new Promise((resolve) => {
+            const checkModalClosed = setInterval(() => {
+                if (!showDiagnosisModal) {  // 모달이 닫히면
+                    clearInterval(checkModalClosed);  // 인터벌을 클리어하고
+                    resolve();  // Promise를 해결하여 다음 단계로 이동
+                }
+            }, 500);  // 500ms마다 모달 상태를 체크
+        });
+
+        // 리뷰 페이지로 이동
+        navigateToReview();
     }
 
     async function editDiary(diary_edit) {
