@@ -125,10 +125,18 @@ function DiaryList(props) {
                     try {
                         const querySnapshot = await getDocs(q);
                         querySnapshot.forEach((doc) => {
-                            tempArr.push({
-                                ...doc.data(),
-                                patientEmail: patientEmail  // 각 일기에 환자의 이메일 추가
-                            });
+                            const data = doc.data();
+
+                            // 데이터가 유효한지 확인
+                            if (data.sessionEnd && data.diary) {
+                                // 환자 이메일과 함께 추가
+                                tempArr.push({
+                                    ...data,
+                                    patientEmail: patientEmail
+                                });
+                            } else {
+                                console.warn(`유효하지 않은 데이터: ${JSON.stringify(data)} (문서 ID: ${doc.id})`);
+                            }
                         });
                     } catch (error) {
                         console.error(`Error fetching diary for patient ${patientEmail}:`, error);
@@ -143,12 +151,22 @@ function DiaryList(props) {
             try {
                 const querySnapshot = await getDocs(q);
                 querySnapshot.forEach((doc) => {
-                    tempArr.push(doc.data());
+                    const data = doc.data();
+
+                    // 데이터가 유효한지 확인
+                    if (data.sessionEnd && data.diary) {
+                        tempArr.push(data);
+                    } else {
+                        console.warn(`유효하지 않은 데이터: ${JSON.stringify(data)} (문서 ID: ${doc.id})`);
+                    }
                 });
             } catch (error) {
                 console.error("Error fetching diary:", error);
             }
         }
+
+        // 가져온 데이터를 콘솔에 출력
+        console.log("가져온 일기 데이터:", tempArr);
 
         if (tempArr.length === 0) {
             setEmptyList(true);
@@ -197,9 +215,11 @@ function DiaryList(props) {
                                     <Col key={idx}>
                                         <Card style={{ width: '100%' }}>
                                             <Card.Body>
-                                                <Card.Title>{Unix_timestamp(diary["sessionEnd"])}</Card.Title>
+                                                <Card.Title>{diary.sessionEnd ? Unix_timestamp(diary["sessionEnd"]) : "작성일 없음"}</Card.Title>
                                                 <Card.Subtitle className="mb-2 text-muted">
-                                                    <div className="nav_title_blue">{Unix_timestamp2(diary["sessionEnd"])}</div>
+                                                    <div className="nav_title_blue">
+                                                        {diary.sessionEnd ? Unix_timestamp2(diary["sessionEnd"]) : "작성 시간 없음"}
+                                                    </div>
                                                     {userType === "doctor" && (
                                                         <div className="nav_title_blue">환자 이메일: {diary.patientEmail}</div>
                                                     )}
