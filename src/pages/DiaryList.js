@@ -127,14 +127,15 @@ function DiaryList(props) {
                         querySnapshot.forEach((doc) => {
                             const data = doc.data();
 
-                            // sessionEnd 값이 존재하는지 확인
-                            if (data.sessionEnd) {
+                            // 데이터가 유효한지 확인
+                            if (data.sessionEnd && data.diary) {
+                                // 환자 이메일과 함께 추가
                                 tempArr.push({
                                     ...data,
-                                    patientEmail: patientEmail  // 각 일기에 환자의 이메일 추가
+                                    patientEmail: patientEmail
                                 });
                             } else {
-                                console.warn(`sessionEnd 값이 없는 문서가 있습니다. ID: ${doc.id}`);
+                                console.warn(`유효하지 않은 데이터: ${JSON.stringify(data)} (문서 ID: ${doc.id})`);
                             }
                         });
                     } catch (error) {
@@ -152,17 +153,20 @@ function DiaryList(props) {
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
 
-                    // sessionEnd 값이 존재하는지 확인
-                    if (data.sessionEnd) {
+                    // 데이터가 유효한지 확인
+                    if (data.sessionEnd && data.diary) {
                         tempArr.push(data);
                     } else {
-                        console.warn(`sessionEnd 값이 없는 문서가 있습니다. ID: ${doc.id}`);
+                        console.warn(`유효하지 않은 데이터: ${JSON.stringify(data)} (문서 ID: ${doc.id})`);
                     }
                 });
             } catch (error) {
                 console.error("Error fetching diary:", error);
             }
         }
+
+        // 가져온 데이터를 콘솔에 출력
+        console.log("가져온 일기 데이터:", tempArr);
 
         if (tempArr.length === 0) {
             setEmptyList(true);
