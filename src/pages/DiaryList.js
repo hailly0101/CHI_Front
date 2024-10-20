@@ -33,9 +33,11 @@ function DiaryList(props) {
             if (userDoc.exists()) {
                 // 의사 계정이면 doctor로 설정
                 setUserType("doctor");
+                console.log("의사 계정입니다. 이메일: ", props.userMail);
             } else {
                 // 의사 계정이 아니면 patient로 설정
                 setUserType("patient");
+                console.log("환자 계정입니다. 이메일: ", props.userMail);
             }
         }
 
@@ -118,7 +120,11 @@ function DiaryList(props) {
             if (userDoc.exists()) {
                 const patients = userDoc.data().patient; // 환자 이메일 목록
 
+                console.log("환자 이메일 목록: ", patients);  // 환자 이메일 목록 출력
+
                 for (const patientEmail of patients) {
+                    console.log("현재 환자: ", patientEmail);  // 각 환자 이메일 출력
+
                     const diaryCompleteCollRef = collection(db, 'session', patientEmail, 'diary');
                     const q = query(diaryCompleteCollRef, where('isFinished', '==', true));
 
@@ -129,6 +135,8 @@ function DiaryList(props) {
 
                             // 데이터가 유효한지 확인
                             if (data.sessionEnd && data.diary) {
+                                console.log("가져온 일기 데이터: ", data);  // 유효한 데이터 출력
+                                
                                 // 환자 이메일과 함께 추가
                                 tempArr.push({
                                     ...data,
@@ -142,9 +150,12 @@ function DiaryList(props) {
                         console.error(`Error fetching diary for patient ${patientEmail}:`, error);
                     }
                 }
+            } else {
+                console.warn("의사 계정에 환자 정보가 없습니다.");
             }
         } else {
             // 환자일 경우 자신의 일기만 불러옴
+            console.log("현재 환자 계정으로 일기 가져오는 중: ", props.userMail);
             const diaryCompleteCollRef = collection(db, 'session', props.userMail, 'diary');
             const q = query(diaryCompleteCollRef, where('isFinished', '==', true));
 
@@ -155,6 +166,7 @@ function DiaryList(props) {
 
                     // 데이터가 유효한지 확인
                     if (data.sessionEnd && data.diary) {
+                        console.log("가져온 일기 데이터: ", data);  // 유효한 데이터 출력
                         tempArr.push(data);
                     } else {
                         console.warn(`유효하지 않은 데이터: ${JSON.stringify(data)} (문서 ID: ${doc.id})`);
@@ -165,8 +177,7 @@ function DiaryList(props) {
             }
         }
 
-        // 가져온 데이터를 콘솔에 출력
-        console.log("가져온 일기 데이터:", tempArr);
+        console.log("최종적으로 가져온 모든 일기 데이터: ", tempArr);  // 최종 데이터 출력
 
         if (tempArr.length === 0) {
             setEmptyList(true);
