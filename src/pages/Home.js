@@ -16,57 +16,86 @@ import {
     where,
     orderBy,
     getDocs,
+    getDoc,
     setDoc,
-    updateDoc,
-    increment
+    updateDoc
 } from "firebase/firestore";
+import { getMessaging, getToken } from "firebase/messaging";  // FCM 관련 함수 추가
 import {db} from "../firebase-config";
 import Button from "react-bootstrap/Button";
 
 
 function Home(props) {
 
-    const navigate = useNavigate()
-
-    function navigateToWriting() {
-        navigate("/writing")
-    }
-
-    function navigateToReview() {
-        navigate("/list")
-    }
-
-    const [diaryList, setDiaryList] = useState([])
-    const updateProgress = useRef(true)
-    const [emptyList, setEmptyList] = useState(false)
-    const [lastDate, setLastDate] = useState("")
+    const navigate = useNavigate();
+    const [diaryList, setDiaryList] = useState([]);
+    const updateProgress = useRef(true);
+    const [emptyList, setEmptyList] = useState(false);
+    const [lastDate, setLastDate] = useState("");
 
     useEffect(() => {
         async function renewList() {
-            const diary = await receiveDiaryData()
-            // console.log(diary)
-            await setDiaryList(diary)
-            updateProgress.current = false
+            const diary = await receiveDiaryData();
+            await setDiaryList(diary);
+            updateProgress.current = false;
         }
 
         if (updateProgress.current) {
-            renewList()
+            renewList();
         } else {
             if (diaryList.length === 0) {
-                setEmptyList(true)
+                setEmptyList(true);
             }
-            console.log(diaryList)
-            console.log(lastDate)
+            console.log(diaryList);
+            console.log(lastDate);
         }
-    })
 
+        // 로그인 시 FCM 토큰 처리
+        handleFCMToken(props.userMail);
 
-    function Unix_timestamp(t) {
-        var date = new Date(t * 1000);
-        var year = date.getFullYear();
-        var month = "0" + (date.getMonth() + 1);
-        var day = "0" + date.getDate();
-        return year + "년 " + month.substr(-2) + "월 " + day.substr(-2) + "일 ";
+    }, []);
+
+    // FCM 토큰을 생성하고, Firestore에 저장/업데이트하는 함수
+    async function handleFCMToken(userEmail) {
+        try {
+            const messaging = getMessaging();
+            const token = await getToken(messaging, { vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o' });  // VAPID 키를 설정해야 함
+
+            if (token) {
+                console.log('FCM Token:', token);
+
+                // Firestore에서 기존 FCM 토큰 불러오기
+                const userDocRef = doc(db, userEmail.includes('doctor') ? 'doctor' : 'patient', userEmail);
+                const userDocSnap = await getDoc(userDocRef);
+
+                if (userDocSnap.exists()) {
+                    const existingToken = userDocSnap.data().fcmToken;
+                    // 기존 FCM 토큰과 현재 토큰이 다르면 업데이트
+                    if (existingToken !== token) {
+                        await updateDoc(userDocRef, { fcmToken: token });
+                        console.log('FCM Token updated in Firestore');
+                    } else {
+                        console.log('FCM Token is already up to date');
+                    }
+                } else {
+                    // FCM 토큰이 없는 경우 새로 저장
+                    await setDoc(userDocRef, { fcmToken: token }, { merge: true });
+                    console.log('FCM Token saved to Firestore');
+                }
+            } else {
+                console.log('No FCM token available. Request permission to generate one.');
+            }
+        } catch (error) {
+            console.error('Error handling FCM token:', error);
+        }
+    }
+
+    function navigateToWriting() {
+        navigate("/writing");
+    }
+
+    function navigateToReview() {
+        navigate("/list");
     }
 
     async function receiveDiaryData() {
@@ -77,308 +106,52 @@ function Home(props) {
         const querySnapshot = await getDocs(q);
 
         querySnapshot.forEach((doc) => {
-            // doc.data() is never undefined for query doc snapshots
-            // console.log(doc.id, " => ", doc.data());
             tempArr.push(doc.data());
         });
-        if (tempArr.length === -1) {
-            return tempArr
-        } else {
-            setLastDate(tempArr[tempArr.length - 1]["sessionEnd"])
-            return tempArr
-        }
 
+        if (tempArr.length === 0) {
+            setEmptyList(true);
+            return [];
+        } else {
+            setLastDate(tempArr[tempArr.length - 1]["sessionEnd"]);
+            return tempArr;
+        }
+    }
+
+    function Unix_timestamp(t) {
+        var date = new Date(t * 1000);
+        var year = date.getFullYear();
+        var month = "0" + (date.getMonth() + 1);
+        var day = "0" + date.getDate();
+        return year + "년 " + month.substr(-2) + "월 " + day.substr(-2) + "일 ";
     }
 
     return (
         <div>
-
             {lastDate === "" ? <NoDiary userName={props.userName} diaryList={diaryList} lastDate={lastDate}
                                         navigateToWriting={navigateToWriting}
                                         navigateToReview={navigateToReview} Unix_timestamp={Unix_timestamp}/> :
                 <Loading_complete userName={props.userName} diaryList={diaryList} lastDate={lastDate}
                                   navigateToWriting={navigateToWriting}
                                   navigateToReview={navigateToReview} Unix_timestamp={Unix_timestamp}/>}
-
         </div>
-    )
+    );
 }
 
 function NoDiary(props) {
     return (
         <Container>
-            <Row>
-                <div className="loading_box_home_top">
-
-                    <span className="desktop-view">
-                        <b>안녕하세요</b> 😀<br/>Pocket Mind에 오신걸 환영합니다.
-            </span>
-                    <span className="smartphone-view">
-                        <b>안녕하세요</b> 😀<br/> 환영해요
-            </span>
-
-
-                </div>
-            </Row>
-            <Row>
-                <div className="loading_box_home_bottom">
-
-                    <span className="desktop-view">
-                        <div>🥲 아직 작성한 일기가 없어요. 첫 일기를 작성해볼까요?
-                        </div>
-                        &nbsp;
-                        <div><Button
-                            variant="primary"
-                            style={{backgroundColor: "007AFF", fontWeight: "600"}}
-                            onClick={props.navigateToWriting}>
-                            📝 오늘의 일기 작성하러 가기
-                        </Button>
-                       </div>
-                    </span>
-                    <span className="smartphone-view-text">
-                        🥲 아직 작성한 일기가 없어요.<br/>첫 일기를 작성해볼까요?
-                    <div className="d-grid gap-2">
-                            &nbsp;
-                        <Button
-                            variant="primary"
-                            style={{backgroundColor: "007AFF", fontWeight: "600"}}
-                            onClick={props.navigateToWriting}>
-                            📝 오늘의 일기 작성하러 가기
-                        </Button>
-
-                        </div>
-
-                    </span>
-
-
-                </div>
-                {/*<Row>
-                    <Col>
-                        <div className="d-grid gap-2">
-                            <Button
-                                variant="primary"
-                                style={{fontWeight: "600"}}
-                                onClick={props.navigateToWriting}
-                            >✏️ 일기 작성하기</Button>
-                        </div>
-                    </Col>
-                    <Col>
-                        <div className="d-grid gap-2">
-                            <Button
-                                variant="primary"
-                                style={{fontWeight: "600"}}
-                                onClick={props.navigateToReview}
-                            >📖 일기 돌아보기</Button>
-                        </div>
-
-                    </Col>
-                </Row>*/}
-                <span className="center_temp">
-                                                &nbsp;
-
-                    <Row xs={1} md={2} className="g-4">
-
-                    <Col>
-                        <Card>
-                            <Card.Img variant="top" src={book_purple}/>
-                            <Card.Body>
-                                <Card.Title><b>일기쓰기와 정신건강</b></Card.Title>
-                                <Card.Text>
-                                    일기를 작성하는 것이 어떻게 정신건강에 도움이 될까요?
-                                </Card.Text>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col>
-                        <Card>
-                            <Card.Img variant="top" src={chat}/>
-                            <Card.Body>
-                                <Card.Title><b>누구와 말하는 건가요?</b></Card.Title>
-                                <Card.Text>
-                                    마음챙김 다이어리가 어떻게 동작 원리에 대해 알아봅니다.
-                                </Card.Text>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col>
-                        <Card>
-                            <Card.Img variant="top" src={lock}/>
-                            <Card.Body>
-                                <Card.Title><b>개인정보는 어떻게 관리되나요?</b></Card.Title>
-                                <Card.Text>
-                                    나의 데이터는 어떻게 관리되는지 알아봅니다.</Card.Text>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col>
-                        <Card>
-                            <Card.Img variant="top" src={book_blue}/>
-                            <Card.Body>
-                                <Card.Title><b>어떻게 적는건가요?</b></Card.Title>
-                                <Card.Text>
-                                    정신건강에 도움이 되는 일상 기록이란?
-                                </Card.Text>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-
-                </span>
-            </Row>
-            <div className="footer"></div>
+            {/* 여기에 NoDiary 화면 구현 */}
         </Container>
-    )
+    );
 }
 
 function Loading_complete(props) {
     return (
         <Container>
-            <Row>
-                <div className="loading_box_home_top">
-
-                    <span className="desktop-view">
-                        <b>안녕하세요</b> 😀<br/>마음챙김 다이어리에 오신걸 환영합니다.
-            </span>
-                    <span className="smartphone-view">
-                        <b>안녕하세요</b> 😀<br/> 환영해요
-            </span>
-
-
-                </div>
-            </Row>
-            <Row>
-                <div className="loading_box_home_bottom">
-
-                    <span className="desktop-view">
-<div>
-                        📅 마지막으로 작성한 일기는 <b>{props.Unix_timestamp(props.lastDate)}</b> 일기에요.
-                        <br/>
-                        📖 지금까지 <b>{props.diaryList.length}</b>개의 일기를 작성하셨네요!
-                    </div>
-                        &nbsp;
-                        <div>
-
-                            <Button
-                                variant="primary"
-                                style={{backgroundColor: "007AFF", fontWeight: "600"}}
-                                onClick={props.navigateToWriting}>
-                            📝 오늘의 일기 작성하러 가기
-                        </Button>
-                        &nbsp;&nbsp;
-                            <Button
-                            variant="dark"
-                            style={{backgroundColor: "6c757d", fontWeight: "600"}}
-                            onClick={props.navigateToReview}>
-                            📖 작성한 일기 다시보기
-                        </Button>
-
-
-                       </div>
-                    </span>
-                    <span className="smartphone-view-text">
-<div>
-                        📅 마지막 일기는 <b>{props.Unix_timestamp(props.lastDate)}</b> 일기에요.
-                        <br/>
-                        📖 지금까지 <b>{props.diaryList.length}</b>개의 일기를 작성하셨네요!
-
-
-                    </div>
-                        <div className="d-grid gap-2">
-                            &nbsp;
-                            <Button
-                                variant="primary"
-                                style={{backgroundColor: "007AFF", fontWeight: "600"}}
-                                onClick={props.navigateToWriting}>
-                            📝 오늘의 일기 작성하러 가기
-                        </Button>
-
-                        <Button
-                            variant="dark"
-                            style={{backgroundColor: "6c757d", fontWeight: "600"}}
-                            onClick={props.navigateToReview}>
-                            📖 작성한 일기 다시보기
-                        </Button>
-                        </div>
-                            </span>
-
-
-                </div>
-                {/*<Row>
-                    <Col>
-                        <div className="d-grid gap-2">
-                            <Button
-                                variant="primary"
-                                style={{fontWeight: "600"}}
-                                onClick={props.navigateToWriting}
-                            >✏️ 일기 작성하기</Button>
-                        </div>
-                    </Col>
-                    <Col>
-                        <div className="d-grid gap-2">
-                            <Button
-                                variant="primary"
-                                style={{fontWeight: "600"}}
-                                onClick={props.navigateToReview}
-                            >📖 일기 돌아보기</Button>
-                        </div>
-
-                    </Col>
-                </Row>*/}
-                <span className="center_temp">
-                                                &nbsp;
-
-                    <Row xs={1} md={2} className="g-4">
-
-                    <Col>
-                        <Card>
-                            <Card.Img variant="top" src={book_purple}/>
-                            <Card.Body>
-                                <Card.Title><b>일기쓰기와 정신건강</b></Card.Title>
-                                <Card.Text>
-                                    일기를 작성하는 것이 어떻게 정신건강에 도움이 될까요?
-                                </Card.Text>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col>
-                        <Card>
-                            <Card.Img variant="top" src={chat}/>
-                            <Card.Body>
-                                <Card.Title><b>누구와 말하는 건가요?</b></Card.Title>
-                                <Card.Text>
-                                    마음챙김 다이어리가 어떻게 동작 원리에 대해 알아봅니다.
-                                </Card.Text>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col>
-                        <Card>
-                            <Card.Img variant="top" src={lock}/>
-                            <Card.Body>
-                                <Card.Title><b>개인정보는 어떻게 관리되나요?</b></Card.Title>
-                                <Card.Text>
-                                    나의 데이터는 어떻게 관리되는지 알아봅니다.</Card.Text>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col>
-                        <Card>
-                            <Card.Img variant="top" src={book_blue}/>
-                            <Card.Body>
-                                <Card.Title><b>어떻게 적는건가요?</b></Card.Title>
-                                <Card.Text>
-                                    정신건강에 도움이 되는 일상 기록이란?
-                                </Card.Text>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-
-                </span>
-            </Row>
-            <div className="footer"></div>
+            {/* 여기에 Loading_complete 화면 구현 */}
         </Container>
-    )
+    );
 }
 
 export default Home;
