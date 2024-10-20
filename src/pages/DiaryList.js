@@ -4,6 +4,8 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import React from 'react';
 import Card from 'react-bootstrap/Card';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
 import {
     collection,
     query,
@@ -12,7 +14,8 @@ import {
     updateDoc,
     increment,
     doc,
-    getDoc
+    getDoc,
+    setDoc
 } from "firebase/firestore";
 import { db } from "../firebase-config";
 
@@ -22,6 +25,7 @@ function DiaryList(props) {
     const [emptyList, setEmptyList] = useState(false);
     const [refresh, setRefresh] = useState(1);
     const [userType, setUserType] = useState(null);  // 의사 또는 환자 정보 저장
+    const [feedback, setFeedback] = useState({});  // 피드백 상태 저장
 
     // 사용자 유형을 Firestore에서 확인하여 의사 또는 환자 구분
     useEffect(() => {
@@ -115,6 +119,31 @@ function DiaryList(props) {
         }
     }
 
+    // 피드백을 Firestore에 저장하는 함수
+    async function handleFeedbackSubmit(idx, patientEmail, sessionNumber) {
+        const feedbackText = feedback[idx] || ""; // 피드백 입력 값 가져오기
+        if (feedbackText) {
+            // Firestore에 피드백 저장
+            const diaryDocRef = doc(db, 'session', patientEmail, 'diary', sessionNumber);
+            await updateDoc(diaryDocRef, {
+                feedback: feedbackText
+            });
+            console.log("피드백 저장 완료:", feedbackText);
+
+            // 상태를 새로고침
+            updateProgress.current = true;
+            setRefresh(refresh + 1);
+        }
+    }
+
+    // 피드백 입력 값을 상태로 저장
+    const handleFeedbackChange = (idx, value) => {
+        setFeedback((prevState) => ({
+            ...prevState,
+            [idx]: value
+        }));
+    };
+
     // 의사 계정이면 환자들의 일기를, 환자 계정이면 자신의 일기만 불러오는 함수
     async function receiveDiaryData() {
         let tempArr = [];
@@ -147,7 +176,8 @@ function DiaryList(props) {
                                 // 환자 이메일과 함께 추가
                                 tempArr.push({
                                     ...data,
-                                    patientEmail: patientEmail
+                                    patientEmail: patientEmail,
+                                    sessionNumber: doc.id // 세션 번호 저장
                                 });
                             } else {
                                 console.warn(`유효하지 않은 데이터: ${JSON.stringify(data)} (문서 ID: ${doc.id})`);
@@ -245,6 +275,30 @@ function DiaryList(props) {
                                                 <Card.Text>{diary["diary"]}</Card.Text>
                                                 <span className="likebutton" onClick={() => addLike(idx)}>️❤️</span> <b>{diary["like"]}</b>
                                                 <span className="likebutton" onClick={() => addMuscle(idx)}>&nbsp;&nbsp;&nbsp;💪️ </span><b>{diary["muscle"]}</b>
+
+                                                {/* 피드백 입력 및 보여주는 칸 */}
+                                                {userType === "doctor" && (
+                                                    <>
+                                                        <Form.Group controlId={`feedbackForm-${idx}`}>
+                                                            <Form.Label>피드백 입력:</Form.Label>
+                                                            <Form.Control
+                                                                as="textarea"
+                                                                rows={3}
+                                                                value={feedback[idx] || ""}
+                                                                onChange={(e) => handleFeedbackChange(idx, e.target.value)}
+                                                            />
+                                                            <Button
+                                                                variant="primary"
+                                                                onClick={() => handleFeedbackSubmit(idx, diary.patientEmail, diary.sessionNumber)}
+                                                            >
+                                                                피드백 저장
+                                                            </Button>
+                                                        </Form.Group>
+                                                        <div>
+                                                            <strong>저장된 피드백:</strong> {diary.feedback || "피드백이 없습니다."}
+                                                        </div>
+                                                    </>
+                                                )}
                                             </Card.Body>
                                         </Card>
                                     </Col>
