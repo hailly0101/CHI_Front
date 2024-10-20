@@ -66,7 +66,6 @@ function DiaryList(props) {
         }
     }, [userType]);  // userType이 변경될 때마다 실행
 
-    // Timestamp 변환 함수
     function Unix_timestamp(t) {
         const date = new Date(t * 1000);
         const year = date.getFullYear();
@@ -82,7 +81,6 @@ function DiaryList(props) {
         return `${hour.substr(-2)}시 ${minute.substr(-2)}분 작성됨`;
     }
 
-    // 좋아요 추가 기능
     async function addLike(idx) {
         const findSession = diaryList[idx]["sessionNumber"];
         const diaryCollectionRef = collection(db, 'session', props.userMail, 'diary');
@@ -100,7 +98,6 @@ function DiaryList(props) {
         }
     }
 
-    // 근육 추가 기능
     async function addMuscle(idx) {
         const findSession = diaryList[idx]["sessionNumber"];
         const diaryCollectionRef = collection(db, 'session', props.userMail, 'diary');
@@ -118,7 +115,6 @@ function DiaryList(props) {
         }
     }
 
-    // 피드백을 Firestore에 저장하는 함수
     async function handleFeedbackSubmit(idx, patientEmail, sessionNumber) {
         const feedbackText = feedback[idx] || ""; // 피드백 입력 값 가져오기
         if (feedbackText) {
@@ -128,12 +124,10 @@ function DiaryList(props) {
             });
             console.log("피드백 저장 완료:", feedbackText);
 
-            // 피드백 저장 후 페이지 새로고침
-            window.location.reload();
+            window.location.reload(); // 피드백 저장 후 페이지 새로고침
         }
     }
 
-    // 피드백 입력 값을 상태로 저장
     const handleFeedbackChange = (idx, value) => {
         setFeedback((prevState) => ({
             ...prevState,
@@ -141,7 +135,6 @@ function DiaryList(props) {
         }));
     };
 
-    // 피드백 수정 상태 토글
     const toggleFeedbackEdit = (idx) => {
         setEditingFeedback((prevState) => ({
             ...prevState,
@@ -149,7 +142,6 @@ function DiaryList(props) {
         }));
     };
 
-    // 의사 계정이면 환자들의 일기를, 환자 계정이면 자신의 일기만 불러오는 함수
     async function receiveDiaryData() {
         let tempArr = [];
         let unfinishedFeedbackCount = 0;
@@ -218,7 +210,8 @@ function DiaryList(props) {
                     <Row>
                         <Col>
                             <div className="diarylist_box">
-                                <div>환자 일기 피드백</div>
+                                <div className="desktop-view">환자 일기 피드백</div>
+                                <div className="smartphone-view-text">환자 일기 피드백</div>
                             </div>
                             <div className="loading_box_home_bottom">
                                 <span className="desktop-view">
@@ -240,7 +233,8 @@ function DiaryList(props) {
                     <Row>
                         <Col>
                             <div className="diarylist_box">
-                                <div>환자 일기 피드백</div>
+                                <div className="desktop-view">환자 일기 피드백</div>
+                                <div className="smartphone-view-text">환자 일기 피드백</div>
                                 <div>피드백 미완료: {unfinishedFeedbackCount}</div>
                             </div>
                         </Col>
@@ -254,7 +248,10 @@ function DiaryList(props) {
                                             <Card.Body>
                                                 <Card.Title>{diary.sessionEnd ? Unix_timestamp(diary["sessionEnd"]) : "작성일 없음"}</Card.Title>
                                                 <Card.Subtitle className="mb-2 text-muted">
-                                                    <div className="nav_title_blue">
+                                                    <div className="nav_title_blue desktop-view">
+                                                        {diary.sessionEnd ? Unix_timestamp2(diary["sessionEnd"]) : "작성 시간 없음"}
+                                                    </div>
+                                                    <div className="nav_title_blue smartphone-view-text">
                                                         {diary.sessionEnd ? Unix_timestamp2(diary["sessionEnd"]) : "작성 시간 없음"}
                                                     </div>
                                                     {userType === "doctor" && (
@@ -265,8 +262,7 @@ function DiaryList(props) {
                                                 <span className="likebutton" onClick={() => addLike(idx)}>️❤️</span> <b>{diary["like"]}</b>
                                                 <span className="likebutton" onClick={() => addMuscle(idx)}>&nbsp;&nbsp;&nbsp;💪️ </span><b>{diary["muscle"]}</b>
 
-                                                {/* 피드백 입력 및 보여주는 칸 */}
-                                                {userType === "doctor" && (
+                                                {userType === "doctor" ? (
                                                     <>
                                                         {editingFeedback[idx] ? (
                                                             <Form.Group controlId={`feedbackForm-${idx}`}>
@@ -286,13 +282,17 @@ function DiaryList(props) {
                                                             </Form.Group>
                                                         ) : (
                                                             <div>
-                                                                <strong>저장된 피드백:</strong> {diary.feedback || "피드백이 없습니다."}
+                                                                <strong>저장된 피드백:</strong> {diary.feedback || "피드백을 입력하세요"}
                                                                 <Button variant="link" onClick={() => toggleFeedbackEdit(idx)}>
-                                                                    수정하기
+                                                                    {diary.feedback ? "수정하기" : "입력하기"}
                                                                 </Button>
                                                             </div>
                                                         )}
                                                     </>
+                                                ) : (
+                                                    <div>
+                                                        <strong>저장된 피드백:</strong> {diary.feedback || "아직 피드백이 없습니다."}
+                                                    </div>
                                                 )}
                                             </Card.Body>
                                         </Card>
