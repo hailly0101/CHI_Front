@@ -62,7 +62,7 @@ function Home(props) {
             const token = await getToken(messaging, { vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o' });  // VAPID 키를 설정해야 함
 
             if (token) {
-                console.log('FCM Token:', token);
+                console.log('FCM Token generated:', token);  // FCM 토큰이 성공적으로 생성되었음을 콘솔에 출력
 
                 // Firestore에서 기존 FCM 토큰 불러오기
                 const userDocRef = doc(db, userEmail.includes('doctor') ? 'doctor' : 'patient', userEmail);
@@ -73,20 +73,20 @@ function Home(props) {
                     // 기존 FCM 토큰과 현재 토큰이 다르면 업데이트
                     if (existingToken !== token) {
                         await updateDoc(userDocRef, { fcmToken: token });
-                        console.log('FCM Token updated in Firestore');
+                        console.log('FCM Token updated in Firestore:', token);  // Firestore에서 토큰이 업데이트됨을 콘솔에 출력
                     } else {
-                        console.log('FCM Token is already up to date');
+                        console.log('FCM Token is already up to date:', existingToken);  // Firestore에 있는 기존 토큰이 동일하다는 것을 콘솔에 출력
                     }
                 } else {
                     // FCM 토큰이 없는 경우 새로 저장
                     await setDoc(userDocRef, { fcmToken: token }, { merge: true });
-                    console.log('FCM Token saved to Firestore');
+                    console.log('FCM Token saved to Firestore:', token);  // Firestore에 토큰이 저장되었음을 콘솔에 출력
                 }
             } else {
                 console.log('No FCM token available. Request permission to generate one.');
             }
         } catch (error) {
-            console.error('Error handling FCM token:', error);
+            console.error('Error handling FCM token:', error);  // 오류 발생 시 콘솔에 오류 메시지 출력
         }
     }
 
