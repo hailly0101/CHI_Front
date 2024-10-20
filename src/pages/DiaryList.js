@@ -124,7 +124,15 @@ function DiaryList(props) {
             });
             console.log("피드백 저장 완료:", feedbackText);
 
-            window.location.reload(); // 피드백 저장 후 페이지 새로고침
+            // 피드백이 저장되면 상태를 업데이트하여 화면만 새로고침
+            setDiaryList((prevState) => {
+                const updatedDiaryList = [...prevState];
+                updatedDiaryList[idx].feedback = feedbackText;
+                return updatedDiaryList;
+            });
+
+            // 피드백 저장 후 수정 상태 해제
+            toggleFeedbackEdit(idx);
         }
     }
 
