@@ -41,20 +41,27 @@ function DiaryList(props) {
             }
         }
 
-        async function renewList() {
-            const diary = await receiveDiaryData();
-            setDiaryList(diary);
-            updateProgress.current = false;
-        }
+        fetchUserType();
+    }, [props.userMail]);
 
-        if (updateProgress.current) {
-            fetchUserType().then(renewList);
-        } else {
-            if (diaryList.length === 0) {
-                setEmptyList(true);
+    // userType이 설정된 후에 일기 데이터를 가져옴
+    useEffect(() => {
+        if (userType) {
+            async function renewList() {
+                const diary = await receiveDiaryData();
+                setDiaryList(diary);
+                updateProgress.current = false;
+            }
+
+            if (updateProgress.current) {
+                renewList();
+            } else {
+                if (diaryList.length === 0) {
+                    setEmptyList(true);
+                }
             }
         }
-    }, [diaryList]);
+    }, [userType]);  // userType이 변경될 때마다 실행
 
     // Timestamp 변환 함수
     function Unix_timestamp(t) {
