@@ -26,6 +26,7 @@ function DiaryList(props) {
     const [refresh, setRefresh] = useState(1);
     const [userType, setUserType] = useState(null);  // 의사 또는 환자 정보 저장
     const [feedback, setFeedback] = useState({});  // 피드백 상태 저장
+    const [unfinishedFeedbackCount, setUnfinishedFeedbackCount] = useState(0); // 피드백 미완료 개수
 
     // 사용자 유형을 Firestore에서 확인하여 의사 또는 환자 구분
     useEffect(() => {
@@ -130,9 +131,8 @@ function DiaryList(props) {
             });
             console.log("피드백 저장 완료:", feedbackText);
 
-            // 상태를 새로고침
-            updateProgress.current = true;
-            setRefresh(refresh + 1);
+            // 피드백 저장 후 페이지 새로고침
+            window.location.reload();
         }
     }
 
@@ -147,6 +147,7 @@ function DiaryList(props) {
     // 의사 계정이면 환자들의 일기를, 환자 계정이면 자신의 일기만 불러오는 함수
     async function receiveDiaryData() {
         let tempArr = [];
+        let unfinishedFeedbackCount = 0; // 피드백 미완료 개수
 
         if (userType === "doctor") {
             // 의사일 경우 환자들의 일기를 불러옴
@@ -172,7 +173,12 @@ function DiaryList(props) {
                             // 데이터가 유효한지 확인
                             if (data.sessionEnd && data.diary) {
                                 console.log("가져온 일기 데이터: ", data);  // 유효한 데이터 출력
-                                
+
+                                // 피드백이 없는 일기를 상단으로
+                                if (!data.feedback) {
+                                    unfinishedFeedbackCount++;
+                                }
+
                                 // 환자 이메일과 함께 추가
                                 tempArr.push({
                                     ...data,
@@ -187,6 +193,10 @@ function DiaryList(props) {
                         console.error(`Error fetching diary for patient ${patientEmail}:`, error);
                     }
                 }
+
+                // 피드백이 없는 일기를 위로, 완료된 일기를 아래로 정렬
+                tempArr.sort((a, b) => (a.feedback ? 1 : -1));
+                setUnfinishedFeedbackCount(unfinishedFeedbackCount); // 피드백 미완료 개수 업데이트
             } else {
                 console.warn("의사 계정에 환자 정보가 없습니다.");
             }
@@ -230,7 +240,7 @@ function DiaryList(props) {
                     <Row>
                         <Col>
                             <div className="diarylist_box">
-                                <div>일기 돌아보기</div>
+                                <div>환자 일기 피드백</div>
                             </div>
                             <div className="loading_box_home_bottom">
                                 <span className="desktop-view">
@@ -252,7 +262,8 @@ function DiaryList(props) {
                     <Row>
                         <Col>
                             <div className="diarylist_box">
-                                <div>일기 돌아보기</div>
+                                <div>환자 일기 피드백</div>
+                                <div>피드백 미완료: {unfinishedFeedbackCount}</div>
                             </div>
                         </Col>
                     </Row>
