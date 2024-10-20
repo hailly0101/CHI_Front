@@ -26,21 +26,19 @@ function DiaryList(props) {
     const [refresh, setRefresh] = useState(1);
     const [userType, setUserType] = useState(null);  // 의사 또는 환자 정보 저장
     const [feedback, setFeedback] = useState({});  // 피드백 상태 저장
+    const [editingFeedback, setEditingFeedback] = useState({}); // 피드백 수정 상태 저장
     const [unfinishedFeedbackCount, setUnfinishedFeedbackCount] = useState(0); // 피드백 미완료 개수
 
     // 사용자 유형을 Firestore에서 확인하여 의사 또는 환자 구분
     useEffect(() => {
         async function fetchUserType() {
-            // Firestore에서 doctor 컬렉션에서 현재 사용자가 의사인지 확인
-            const userDocRef = doc(db, "doctor", props.userMail);  // 'doctor/{userMail}' 경로로 수정
+            const userDocRef = doc(db, "doctor", props.userMail);
             const userDoc = await getDoc(userDocRef);
 
             if (userDoc.exists()) {
-                // 의사 계정이면 doctor로 설정
                 setUserType("doctor");
                 console.log("의사 계정입니다. 이메일: ", props.userMail);
             } else {
-                // 의사 계정이 아니면 patient로 설정
                 setUserType("patient");
                 console.log("환자 계정입니다. 이메일: ", props.userMail);
             }
@@ -124,7 +122,6 @@ function DiaryList(props) {
     async function handleFeedbackSubmit(idx, patientEmail, sessionNumber) {
         const feedbackText = feedback[idx] || ""; // 피드백 입력 값 가져오기
         if (feedbackText) {
-            // Firestore에 피드백 저장
             const diaryDocRef = doc(db, 'session', patientEmail, 'diary', sessionNumber);
             await updateDoc(diaryDocRef, {
                 feedback: feedbackText
@@ -144,24 +141,26 @@ function DiaryList(props) {
         }));
     };
 
+    // 피드백 수정 상태 토글
+    const toggleFeedbackEdit = (idx) => {
+        setEditingFeedback((prevState) => ({
+            ...prevState,
+            [idx]: !prevState[idx]  // 현재 상태와 반대값으로 토글
+        }));
+    };
+
     // 의사 계정이면 환자들의 일기를, 환자 계정이면 자신의 일기만 불러오는 함수
     async function receiveDiaryData() {
         let tempArr = [];
-        let unfinishedFeedbackCount = 0; // 피드백 미완료 개수
+        let unfinishedFeedbackCount = 0;
 
         if (userType === "doctor") {
-            // 의사일 경우 환자들의 일기를 불러옴
             const userDocRef = doc(db, "doctor", props.userMail);
             const userDoc = await getDoc(userDocRef);
 
             if (userDoc.exists()) {
-                const patients = userDoc.data().patient; // 환자 이메일 목록
-
-                console.log("환자 이메일 목록: ", patients);  // 환자 이메일 목록 출력
-
+                const patients = userDoc.data().patient;
                 for (const patientEmail of patients) {
-                    console.log("현재 환자: ", patientEmail);  // 각 환자 이메일 출력
-
                     const diaryCompleteCollRef = collection(db, 'session', patientEmail, 'diary');
                     const q = query(diaryCompleteCollRef, where('isFinished', '==', true));
 
@@ -169,24 +168,15 @@ function DiaryList(props) {
                         const querySnapshot = await getDocs(q);
                         querySnapshot.forEach((doc) => {
                             const data = doc.data();
-
-                            // 데이터가 유효한지 확인
                             if (data.sessionEnd && data.diary) {
-                                console.log("가져온 일기 데이터: ", data);  // 유효한 데이터 출력
-
-                                // 피드백이 없는 일기를 상단으로
                                 if (!data.feedback) {
                                     unfinishedFeedbackCount++;
                                 }
-
-                                // 환자 이메일과 함께 추가
                                 tempArr.push({
                                     ...data,
                                     patientEmail: patientEmail,
-                                    sessionNumber: doc.id // 세션 번호 저장
+                                    sessionNumber: doc.id
                                 });
-                            } else {
-                                console.warn(`유효하지 않은 데이터: ${JSON.stringify(data)} (문서 ID: ${doc.id})`);
                             }
                         });
                     } catch (error) {
@@ -194,15 +184,10 @@ function DiaryList(props) {
                     }
                 }
 
-                // 피드백이 없는 일기를 위로, 완료된 일기를 아래로 정렬
                 tempArr.sort((a, b) => (a.feedback ? 1 : -1));
-                setUnfinishedFeedbackCount(unfinishedFeedbackCount); // 피드백 미완료 개수 업데이트
-            } else {
-                console.warn("의사 계정에 환자 정보가 없습니다.");
+                setUnfinishedFeedbackCount(unfinishedFeedbackCount);
             }
         } else {
-            // 환자일 경우 자신의 일기만 불러옴
-            console.log("현재 환자 계정으로 일기 가져오는 중: ", props.userMail);
             const diaryCompleteCollRef = collection(db, 'session', props.userMail, 'diary');
             const q = query(diaryCompleteCollRef, where('isFinished', '==', true));
 
@@ -210,21 +195,14 @@ function DiaryList(props) {
                 const querySnapshot = await getDocs(q);
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
-
-                    // 데이터가 유효한지 확인
                     if (data.sessionEnd && data.diary) {
-                        console.log("가져온 일기 데이터: ", data);  // 유효한 데이터 출력
                         tempArr.push(data);
-                    } else {
-                        console.warn(`유효하지 않은 데이터: ${JSON.stringify(data)} (문서 ID: ${doc.id})`);
                     }
                 });
             } catch (error) {
                 console.error("Error fetching diary:", error);
             }
         }
-
-        console.log("최종적으로 가져온 모든 일기 데이터: ", tempArr);  // 최종 데이터 출력
 
         if (tempArr.length === 0) {
             setEmptyList(true);
@@ -290,24 +268,30 @@ function DiaryList(props) {
                                                 {/* 피드백 입력 및 보여주는 칸 */}
                                                 {userType === "doctor" && (
                                                     <>
-                                                        <Form.Group controlId={`feedbackForm-${idx}`}>
-                                                            <Form.Label>피드백 입력:</Form.Label>
-                                                            <Form.Control
-                                                                as="textarea"
-                                                                rows={3}
-                                                                value={feedback[idx] || ""}
-                                                                onChange={(e) => handleFeedbackChange(idx, e.target.value)}
-                                                            />
-                                                            <Button
-                                                                variant="primary"
-                                                                onClick={() => handleFeedbackSubmit(idx, diary.patientEmail, diary.sessionNumber)}
-                                                            >
-                                                                피드백 저장
-                                                            </Button>
-                                                        </Form.Group>
-                                                        <div>
-                                                            <strong>저장된 피드백:</strong> {diary.feedback || "피드백이 없습니다."}
-                                                        </div>
+                                                        {editingFeedback[idx] ? (
+                                                            <Form.Group controlId={`feedbackForm-${idx}`}>
+                                                                <Form.Label>피드백 입력:</Form.Label>
+                                                                <Form.Control
+                                                                    as="textarea"
+                                                                    rows={3}
+                                                                    value={feedback[idx] || ""}
+                                                                    onChange={(e) => handleFeedbackChange(idx, e.target.value)}
+                                                                />
+                                                                <Button
+                                                                    variant="primary"
+                                                                    onClick={() => handleFeedbackSubmit(idx, diary.patientEmail, diary.sessionNumber)}
+                                                                >
+                                                                    피드백 저장
+                                                                </Button>
+                                                            </Form.Group>
+                                                        ) : (
+                                                            <div>
+                                                                <strong>저장된 피드백:</strong> {diary.feedback || "피드백이 없습니다."}
+                                                                <Button variant="link" onClick={() => toggleFeedbackEdit(idx)}>
+                                                                    수정하기
+                                                                </Button>
+                                                            </div>
+                                                        )}
                                                     </>
                                                 )}
                                             </Card.Body>
