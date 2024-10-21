@@ -14,13 +14,18 @@ firebase.initializeApp({
 });
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage(function(payload) {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload);
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-    icon: '/firebase-logo.png'  // 알림 아이콘 경로 설정
-  };
-
-  self.registration.showNotification(notificationTitle, notificationOptions);
+// Optional:
+messaging.onBackgroundMessage((m) => {
+  console.log("onBackgroundMessage", m);
 });
+
+// messaging.onBackgroundMessage(function(payload) {
+//   console.log('[firebase-messaging-sw.js] Received background message ', payload);
+//   const notificationTitle = payload.notification.title;
+//   const notificationOptions = {
+//     body: payload.notification.body,
+//     icon: '/firebase-logo.png'  // 알림 아이콘 경로 설정
+//   };
+
+//   self.registration.showNotification(notificationTitle, notificationOptions);
+// });
