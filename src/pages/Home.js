@@ -101,6 +101,7 @@ function Home(props) {
     // FCM 토큰을 생성하고, 백엔드에 전송하는 함수
     async function handleFCMToken(userEmail, userType) {
         try {
+            print("messaging 객체 초기화")
             // FCM Messaging 객체 초기화
             const messaging = getMessaging();
             
