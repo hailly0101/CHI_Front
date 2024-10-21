@@ -1,8 +1,0 @@
-[[headers]]
-  for = "/*"  # 모든 경로에 대해 설정
-  [headers.values]
-    Access-Control-Allow-Origin = "*"  # 모든 도메인에서 요청 허용
-    Access-Control-Allow-Methods = "GET, POST, OPTIONS"  # 허용할 메소드
-    Access-Control-Allow-Headers = "Content-Type"
-  Content-Security-Policy = "default-src 'self'; script-src 'self' https://apis.example.com https://cdnjs.cloudflare.com; img-src 'self' data:; style-src 'self' 'unsafe-inline';"
-
