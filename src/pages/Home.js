@@ -20,12 +20,12 @@ import {
     updateDoc
 } from "firebase/firestore";
 import { getToken } from "firebase/messaging";  // FCM 관련 함수 추가
-import {app, db, messaging} from "../firebase-config";
+import {app, db, messaging} from "../firebase-config.js";
 import Button from "react-bootstrap/Button";
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-        .register('/firebase-messaging-sw.js', { type: 'module' })  // 'type: module'로 ES 모듈 등록
+        .register("firebase-messaging-sw.js", { type: 'module' })  // 'type: module'로 ES 모듈 등록
         .then((registration) => {
             console.log('Service Worker registered with scope:', registration.scope);
         })

@@ -1,9 +1,6 @@
 importScripts('https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/9.21.0/firebase-messaging.js');
 
-import { initializeApp } from "firebase/app";
-import { getMessaging } from "firebase/messaging/sw";
-
 const firebaseApp = initializeApp({
     apiKey: "AIzaSyA5As5BKbHxAtQLSbpB6wme_2Z0V57LpPU",
     authDomain: "pocketmind-ed11e.firebaseapp.com",
