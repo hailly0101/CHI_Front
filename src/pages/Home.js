@@ -100,6 +100,7 @@ function Home(props) {
     // FCM 토큰을 생성하고, 백엔드에 전송하는 함수
     async function handleFCMToken(userEmail, userType) {
         try {
+            const permission = await Notification.requestPermission();
             if (permission === "granted") {
                 console.log("FCM 토큰 요청 중...");
         
@@ -145,8 +146,7 @@ function Home(props) {
         } catch (error) {
             console.error('Error handling FCM token:', error);
         }
-    }
-        
+    }        
     
 
     function navigateToWriting() {
