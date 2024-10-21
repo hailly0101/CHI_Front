@@ -27,4 +27,18 @@ const db = getFirestore(app);  // Firebase
 const messaging = getMessaging(app);
 const provider = new GoogleAuthProvider();
 
+// Register service worker for Firebase Messaging
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/firebase-messaging-sw.js')
+    .then((registration) => {
+      console.log('Service Worker registered with scope:', registration.scope);
+
+      // Set the service worker in Firebase Messaging
+      messaging.useServiceWorker(registration);
+    })
+    .catch((err) => {
+      console.error('Service Worker registration failed:', err);
+    });
+}
+
 export { messaging, auth, db, provider };

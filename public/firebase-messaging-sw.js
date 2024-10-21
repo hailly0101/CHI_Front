@@ -1,11 +1,10 @@
 importScripts('https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/9.6.10/firebase-messaging.js');
 
-import {messaging} from "../firebase-config";
-
 firebase.initializeApp({
     apiKey: "AIzaSyA5As5BKbHxAtQLSbpB6wme_2Z0V57LpPU",
     authDomain: "pocketmind-ed11e.firebaseapp.com",
+    databaseURL: 'https://pocketmind-ed11e.firebaseio.com',
     projectId: "pocketmind-ed11e",
     storageBucket: "pocketmind-ed11e.appspot.com",
     messagingSenderId: "693520526870",
