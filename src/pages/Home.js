@@ -103,8 +103,8 @@ function Home(props) {
         try {
             console.log("messaging 객체 초기화")
             // FCM Messaging 객체 초기화
-            const messaging = getMessaging();
-            
+            const messaging = getMessaging(app);
+            console.log(messaging)
             // 알림 권한 요청
             const permission = await Notification.requestPermission();
             console.log(permission)
