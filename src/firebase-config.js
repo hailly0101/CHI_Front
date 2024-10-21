@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";  // Firebase Authentication
 import { getFirestore } from "firebase/firestore";  // Firebase Firestore
+import { getMessaging } from "firebase/messaging"; 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -23,7 +24,7 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);  // Firebase Authentication
 const db = getFirestore(app);  // Firebase 
-const messaging = getMessaging(app)
+const messaging = getMessaging(app);
 const provider = new GoogleAuthProvider();
 
 export { messaging, auth, db, provider };
