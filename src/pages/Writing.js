@@ -283,7 +283,60 @@ function Writing(props) {
         }
 
 
+    }   
+    // Firestore에서 담당 의사 이메일과 FCM 토큰 가져오기
+    async function getDoctorInfo(patientEmail) {
+        try {
+            // 'patient' 컬렉션에서 환자의 이메일을 사용하여 문서를 가져옴
+            const patientDocRef = doc(db, 'patient', patientEmail);
+            const patientDoc = await getDoc(patientDocRef);
+    
+            if (patientDoc.exists()) {
+                // 문서가 존재할 경우 담당 의사 정보 가져오기
+                const doctorEmail = patientDoc.data().doctor;  // 담당 의사 이메일
+                return doctorEmail;  
+            } else {
+                console.error("해당 환자의 문서가 존재하지 않습니다.");
+                return null;
+            }
+        } catch (error) {
+            console.error("의사 정보를 가져오는 중 오류 발생:", error);
+            return null;
+        }
     }
+    
+
+    async function sendDiaryNotificationToBackend(doctorEmail, diaryContent) {
+        try {
+            console.log("Starting to send notification to backend...");
+            console.log("Doctor email:", doctorEmail);
+            console.log("Diary content (first 20 characters):", diaryContent.slice(0, 20));
+
+            const response = await fetch('https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/fcm/send-notification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: doctorEmail,  // 담당 의사의 이메일 또는 토큰
+                    title: '새로운 일기 작성 알림',
+                    body: `환자가 새로운 일기를 작성했습니다: ${diaryContent.slice(0, 20)}...`,  // 일기 내용 일부 전송
+                }),
+            });
+            console.log("Fetch request sent. Waiting for response...");
+
+            if (!response.ok) {
+                const errorData = await response.text();
+                console.error('Error sending notification:', errorData);
+            } else {
+                const result = await response.json();
+                console.log('Notification sent successfully:', result);
+            }
+        } catch (error) {
+            console.error('Error sending notification to backend:', error);
+        }
+    }
+
 
     async function submitDiary() {
         await setDoc(doc(db, "session", props.userMail, "diary", session), {
@@ -294,6 +347,15 @@ function Writing(props) {
             diary: diary
         }, {merge: true});
         // navigateToReview()
+
+        // Firestore에서 담당 의사 정보를 가져옴
+        const doctorEmail = await getDoctorInfo(props.userMail);
+    
+        if (doctorEmail) {
+            await sendDiaryNotificationToBackend(doctorEmail, diary);  // 담당 의사의 이메일과 일기내용 전달
+        } else {
+            console.error("담당 의사 정보를 가져올 수 없습니다.");
+        }
 
         // 진단 요청들을 병렬로 실행
         const [counselorDiagnosis, doctorDiagnosis, pocketMindDiagnosis] = await Promise.all([
