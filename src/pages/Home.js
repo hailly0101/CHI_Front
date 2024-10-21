@@ -55,7 +55,7 @@ function Home(props) {
         // 서비스 워커 등록
         useEffect(() => {
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('src/firebase-messaging-sw.js')
+                navigator.serviceWorker.register('/firebase-messaging-sw.js')
                     .then((registration) => {
                         console.log('Service Worker registered with scope:', registration.scope);
                     })
