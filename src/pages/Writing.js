@@ -312,7 +312,7 @@ function Writing(props) {
 
 
     }   
-    async function getRelatedEmail(userEmail, userType) {
+    async function getRelatedEmail({ userEmail, userType }) {
         try {
             console.log("getRelatedEmail");
             console.log(userEmail);
@@ -410,7 +410,7 @@ function Writing(props) {
         // navigateToReview()
 
         // Firestore에서 담당 의사, 관련 환자 정보를 가져옴
-        const relatedEmail = await getRelatedEmail(props.userMail, props.userType);
+        const relatedEmail = await getRelatedEmail({ userEmail: props.userEmail, userType: props.userType });
     
         if (relatedEmail) {
             await sendDiaryNotificationToBackend(relatedEmail, diary);  // 담당 의사의 이메일과 일기내용 전달
