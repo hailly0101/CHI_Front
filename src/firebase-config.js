@@ -27,6 +27,9 @@ const db = getFirestore(app);  // Firebase
 const messaging = getMessaging(app);
 const provider = new GoogleAuthProvider();
 
+console.log("컨피그-메시징");
+console.log(messaging);
+
 // Register service worker for Firebase Messaging
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/firebase-messaging-sw.js')

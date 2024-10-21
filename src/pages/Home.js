@@ -55,6 +55,7 @@ function Home(props) {
         // 서비스 워커 등록
         useEffect(() => {
             if ('serviceWorker' in navigator) {
+                console.log("홈-서비스워커");
                 navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/firebase-cloud-messaging-push-scope' })
                     .then((registration) => {
                         console.log('Service Worker registered with scope:', registration.scope);
@@ -103,7 +104,8 @@ function Home(props) {
             const permission = await Notification.requestPermission();
             if (permission === "granted") {
                 console.log("FCM 토큰 요청 중...");
-        
+                console.log("홈-메시징");
+                console.log(messaging);
                 // Request FCM token using .then() and .catch()
                 getToken(messaging, {
                     vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o'
