@@ -46,7 +46,7 @@ function Writing(props) {
     const updateProgress = useRef(true)
     let [surveyReady, setSurveyReady] = useState(false)
     const [conversation, setConversation] = useState([]);
-    const [userType, setUserType] = useState(null);
+    const [userType, setUserType] = useState('patient');
 
     const diaryRequest = useRef(false)
 
