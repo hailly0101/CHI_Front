@@ -20,7 +20,7 @@ import {
     updateDoc
 } from "firebase/firestore";
 import { getMessaging, getToken } from "firebase/messaging";  // FCM 관련 함수 추가
-import {db, message} from "../firebase-config";
+import {db, messaging} from "../firebase-config";
 import Button from "react-bootstrap/Button";
 
 function Home(props) {
