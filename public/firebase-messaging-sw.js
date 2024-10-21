@@ -1,7 +1,10 @@
 importScripts('https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/9.21.0/firebase-messaging.js');
 
-firebase.initializeApp({
+import { initializeApp } from "firebase/app";
+import { getMessaging } from "firebase/messaging/sw";
+
+const firebaseApp = initializeApp({
     apiKey: "AIzaSyA5As5BKbHxAtQLSbpB6wme_2Z0V57LpPU",
     authDomain: "pocketmind-ed11e.firebaseapp.com",
     databaseURL: 'https://pocketmind-ed11e.firebaseio.com',
@@ -11,7 +14,7 @@ firebase.initializeApp({
     appId: "1:693520526870:web:a8d02e8a0bd9dd36904f37",
     measurementId: "G-RFFY3FL876"
 });
-const messaging = firebase.messaging();
+const messaging =  getMessaging(firebaseApp);
 
 // Optional:
 messaging.onBackgroundMessage((m) => {
