@@ -51,6 +51,19 @@ function Home(props) {
     
         fetchUserType();
     }, [props.userMail]);
+
+        // 서비스 워커 등록
+        useEffect(() => {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('src/firebase-messaging-sw.js')
+                    .then((registration) => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+            }
+        }, []);  // 이 부분을 통해 처음 페이지가 로드될 때 서비스 워커를 등록
     
     useEffect(() => {
         async function renewList() {
