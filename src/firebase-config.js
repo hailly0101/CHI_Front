@@ -24,24 +24,21 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);  // Firebase Authentication
 const db = getFirestore(app);  // Firebase 
-const messaging = getMessaging(app);
+const messaging = getMessaging(app)
 const provider = new GoogleAuthProvider();
 
-console.log("컨피그-메시징");
-console.log(messaging);
+if (await isSupported()) {
+  const messaging = getMessaging(firebaseApp);
 
-// Register service worker for Firebase Messaging
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/firebase-messaging-sw.js')
-    .then((registration) => {
-      console.log('Service Worker registered with scope:', registration.scope);
+  getToken(messaging, { vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o' }).then((currentToken) => {
+    if (currentToken) {
+      console.log('Current token for client:', currentToken);
+    } else {
+      console.log('No registration token available.');
+    }
+  }).catch((err) => {
+    console.error('An error occurred while retrieving token.', err);
+  });
 
-      // Set the service worker in Firebase Messaging
-      messaging.useServiceWorker(registration);
-    })
-    .catch((err) => {
-      console.error('Service Worker registration failed:', err);
-    });
-}
 
 export { messaging, auth, db, provider };

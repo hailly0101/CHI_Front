@@ -27,4 +27,18 @@ const db = getFirestore(app);  // Firebase
 const messaging = getMessaging(app)
 const provider = new GoogleAuthProvider();
 
+if (await isSupported()) {
+  const messaging = getMessaging(firebaseApp);
+
+  getToken(messaging, { vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o' }).then((currentToken) => {
+    if (currentToken) {
+      console.log('Current token for client:', currentToken);
+    } else {
+      console.log('No registration token available.');
+    }
+  }).catch((err) => {
+    console.error('An error occurred while retrieving token.', err);
+  });
+
+
 export { messaging, auth, db, provider };
