@@ -114,7 +114,7 @@ function Home(props) {
                 console.log(messaging);
                 // Request FCM token using .then() and .catch()
                 getToken(messaging, {
-                    vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o'
+                    vapidKey: 'BHxLI9MyVyff7V0GVCp4n6sxF3LwarXbJHHbx1wO2SSil7bgJMy0AiYhONPMrMFpYZ2G6FyDO_AYmHqs-sDJ4p0'
                 }).then((currentToken) => {
                     if (currentToken) {
                         console.log('FCM Token generated:', currentToken);
