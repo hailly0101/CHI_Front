@@ -25,8 +25,7 @@ import Button from "react-bootstrap/Button";
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-        .register("firebase-messaging-sw.js", { type: 'module' })  // 'type: module'로 ES 모듈 등록
-        .then((registration) => {
+        .register("/firebase-messaging-sw.js").then((registration) => {
             console.log('Service Worker registered with scope:', registration.scope);
         })
         .catch((error) => {
