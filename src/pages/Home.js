@@ -19,9 +19,21 @@ import {
     setDoc,
     updateDoc
 } from "firebase/firestore";
-import { getMessaging, getToken } from "firebase/messaging";  // FCM 관련 함수 추가
-import {db, messaging} from "../firebase-config";
+import { getToken } from "firebase/messaging";  // FCM 관련 함수 추가
+import {app, db, messaging} from "../firebase-config";
 import Button from "react-bootstrap/Button";
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+        .register('/firebase-messaging-sw.js', { type: 'module' })  // 'type: module'로 ES 모듈 등록
+        .then((registration) => {
+            console.log('Service Worker registered with scope:', registration.scope);
+        })
+        .catch((error) => {
+            console.error('Service Worker registration failed:', error);
+        });
+}
+
 
 function Home(props) {
 
@@ -83,6 +95,15 @@ function Home(props) {
     
     }, [userType]);  // userType이 변경될 때마다 실행
     
+    getToken(messaging, { vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o' }).then((currentToken) => {
+        if (currentToken) {
+          console.log('Current token for client:', currentToken);
+        } else {
+          console.log('No registration token available.');
+        }
+      }).catch((err) => {
+        console.error('An error occurred while retrieving token.', err);
+      });
 
     // FCM 토큰을 생성하고, 백엔드에 전송하는 함수
     async function handleFCMToken(userEmail, userType) {
