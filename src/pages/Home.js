@@ -35,9 +35,11 @@ function Home(props) {
     // 사용자 유형을 Firestore에서 확인하여 의사 또는 환자 구분
     useEffect(() => {
         async function fetchUserType() {
+            console.log("Fetching user type for:", props.userMail);  // 디버깅 로그 추가
+    
             const userDocRef = doc(db, "doctor", props.userMail);
             const userDoc = await getDoc(userDocRef);
-
+    
             if (userDoc.exists()) {
                 setUserType("doctor");
                 console.log("의사 계정입니다. 이메일: ", props.userMail);
@@ -46,33 +48,40 @@ function Home(props) {
                 console.log("환자 계정입니다. 이메일: ", props.userMail);
             }
         }
-
+    
         fetchUserType();
     }, [props.userMail]);
-
+    
     useEffect(() => {
         async function renewList() {
+            console.log("renewList 함수 실행");  // 디버깅 로그 추가
             const diary = await receiveDiaryData();
             await setDiaryList(diary);
             updateProgress.current = false;
         }
-
+    
         if (updateProgress.current) {
+            console.log("리스트 갱신 중...");  // 디버깅 로그 추가
             renewList();
         } else {
             if (diaryList.length === 0) {
                 setEmptyList(true);
             }
-            console.log(diaryList);
-            console.log(lastDate);
+            console.log("Diary List:", diaryList);  // Diary 리스트 확인용 디버깅 로그 추가
+            console.log("Last Date:", lastDate);  // 마지막 일기 날짜 확인용 디버깅 로그 추가
         }
-
+    
         // userType이 설정된 후에 FCM 토큰 처리
+        console.log("userType 상태 확인:", userType);  // userType 상태 확인용 로그 추가
         if (userType) {
+            console.log("FCM 토큰 처리 시작", userType);  // 조건 진입 여부 디버깅 로그 추가
             handleFCMToken(props.userMail, userType);
+        } else {
+            console.log("userType이 아직 설정되지 않음");  // userType이 설정되지 않은 경우 로그 추가
         }
-
+    
     }, [userType]);  // userType이 변경될 때마다 실행
+    
 
     // FCM 토큰을 생성하고, 백엔드에 전송하는 함수
     async function handleFCMToken(userEmail, userType) {
