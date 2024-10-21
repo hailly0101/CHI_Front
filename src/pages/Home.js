@@ -11,7 +11,6 @@ import lock from "../img/lock.jpg";
 import {
     collection,
     doc,
-    onSnapshot,
     query,
     where,
     orderBy,
@@ -24,7 +23,6 @@ import { getMessaging, getToken } from "firebase/messaging";  // FCM 관련 함�
 import {db} from "../firebase-config";
 import Button from "react-bootstrap/Button";
 
-
 function Home(props) {
 
     const navigate = useNavigate();
@@ -32,6 +30,25 @@ function Home(props) {
     const updateProgress = useRef(true);
     const [emptyList, setEmptyList] = useState(false);
     const [lastDate, setLastDate] = useState("");
+    const [userType, setUserType] = useState(null);  // 의사 또는 환자 정보 저장
+
+    // 사용자 유형을 Firestore에서 확인하여 의사 또는 환자 구분
+    useEffect(() => {
+        async function fetchUserType() {
+            const userDocRef = doc(db, "doctor", props.userMail);
+            const userDoc = await getDoc(userDocRef);
+
+            if (userDoc.exists()) {
+                setUserType("doctor");
+                console.log("의사 계정입니다. 이메일: ", props.userMail);
+            } else {
+                setUserType("patient");
+                console.log("환자 계정입니다. 이메일: ", props.userMail);
+            }
+        }
+
+        fetchUserType();
+    }, [props.userMail]);
 
     useEffect(() => {
         async function renewList() {
@@ -50,43 +67,45 @@ function Home(props) {
             console.log(lastDate);
         }
 
-        // 로그인 시 FCM 토큰 처리
-        handleFCMToken(props.userMail);
+        // userType이 설정된 후에 FCM 토큰 처리
+        if (userType) {
+            handleFCMToken(props.userMail, userType);
+        }
 
-    }, []);
+    }, [userType]);  // userType이 변경될 때마다 실행
 
-    // FCM 토큰을 생성하고, Firestore에 저장/업데이트하는 함수
-    async function handleFCMToken(userEmail) {
+    // FCM 토큰을 생성하고, 백엔드에 전송하는 함수
+    async function handleFCMToken(userEmail, userType) {
         try {
             const messaging = getMessaging();
-            const token = await getToken(messaging, { vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o' });  // VAPID 키를 설정해야 함
+            const token = await getToken(messaging, { vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o' });
 
             if (token) {
-                console.log('FCM Token generated:', token);  // FCM 토큰이 성공적으로 생성되었음을 콘솔에 출력
+                console.log('FCM Token generated:', token);
 
-                // Firestore에서 기존 FCM 토큰 불러오기
-                const userDocRef = doc(db, userEmail.includes('doctor') ? 'doctor' : 'patient', userEmail);
-                const userDocSnap = await getDoc(userDocRef);
+                // FCM 토큰을 백엔드로 전송
+                const response = await fetch("https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/fcm/register-fcm-token", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: userEmail,
+                        userType: userType,  // 'doctor' 또는 'patient'
+                        fcmToken: token,
+                    }),
+                });
 
-                if (userDocSnap.exists()) {
-                    const existingToken = userDocSnap.data().fcmToken;
-                    // 기존 FCM 토큰과 현재 토큰이 다르면 업데이트
-                    if (existingToken !== token) {
-                        await updateDoc(userDocRef, { fcmToken: token });
-                        console.log('FCM Token updated in Firestore:', token);  // Firestore에서 토큰이 업데이트됨을 콘솔에 출력
-                    } else {
-                        console.log('FCM Token is already up to date:', existingToken);  // Firestore에 있는 기존 토큰이 동일하다는 것을 콘솔에 출력
-                    }
+                if (!response.ok) {
+                    console.error('Error registering FCM token:', await response.text());
                 } else {
-                    // FCM 토큰이 없는 경우 새로 저장
-                    await setDoc(userDocRef, { fcmToken: token }, { merge: true });
-                    console.log('FCM Token saved to Firestore:', token);  // Firestore에 토큰이 저장되었음을 콘솔에 출력
+                    console.log('FCM token successfully sent to backend');
                 }
             } else {
-                console.log('No FCM token available. Request permission to generate one.');
+                console.log('No FCM token available.');
             }
         } catch (error) {
-            console.error('Error handling FCM token:', error);  // 오류 발생 시 콘솔에 오류 메시지 출력
+            console.error('Error handling FCM token:', error);
         }
     }
 
@@ -151,7 +170,6 @@ function NoDiary(props) {
                         <b>안녕하세요</b> 😀<br/> 환영해요
             </span>
 
-
                 </div>
             </Row>
             <Row>
@@ -184,31 +202,9 @@ function NoDiary(props) {
 
                     </span>
 
-
                 </div>
-                {/*<Row>
-                    <Col>
-                        <div className="d-grid gap-2">
-                            <Button
-                                variant="primary"
-                                style={{fontWeight: "600"}}
-                                onClick={props.navigateToWriting}
-                            >✏️ 일기 작성하기</Button>
-                        </div>
-                    </Col>
-                    <Col>
-                        <div className="d-grid gap-2">
-                            <Button
-                                variant="primary"
-                                style={{fontWeight: "600"}}
-                                onClick={props.navigateToReview}
-                            >📖 일기 돌아보기</Button>
-                        </div>
-
-                    </Col>
-                </Row>*/}
                 <span className="center_temp">
-                                                &nbsp;
+                    &nbsp;
 
                     <Row xs={1} md={2} className="g-4">
 
@@ -240,7 +236,8 @@ function NoDiary(props) {
                             <Card.Body>
                                 <Card.Title><b>개인정보는 어떻게 관리되나요?</b></Card.Title>
                                 <Card.Text>
-                                    나의 데이터는 어떻게 관리되는지 알아봅니다.</Card.Text>
+                                    나의 데이터는 어떻게 관리되는지 알아봅니다.
+                                </Card.Text>
                             </Card.Body>
                         </Card>
                     </Col>
@@ -277,7 +274,6 @@ function Loading_complete(props) {
                         <b>안녕하세요</b> 😀<br/> 환영해요
             </span>
 
-
                 </div>
             </Row>
             <Row>
@@ -306,7 +302,6 @@ function Loading_complete(props) {
                             📖 작성한 일기 다시보기
                         </Button>
 
-
                        </div>
                     </span>
                     <span className="smartphone-view-text">
@@ -314,7 +309,6 @@ function Loading_complete(props) {
                         📅 마지막 일기는 <b>{props.Unix_timestamp(props.lastDate)}</b> 일기에요.
                         <br/>
                         📖 지금까지 <b>{props.diaryList.length}</b>개의 일기를 작성하셨네요!
-
 
                     </div>
                         <div className="d-grid gap-2">
@@ -335,31 +329,9 @@ function Loading_complete(props) {
                         </div>
                             </span>
 
-
                 </div>
-                {/*<Row>
-                    <Col>
-                        <div className="d-grid gap-2">
-                            <Button
-                                variant="primary"
-                                style={{fontWeight: "600"}}
-                                onClick={props.navigateToWriting}
-                            >✏️ 일기 작성하기</Button>
-                        </div>
-                    </Col>
-                    <Col>
-                        <div className="d-grid gap-2">
-                            <Button
-                                variant="primary"
-                                style={{fontWeight: "600"}}
-                                onClick={props.navigateToReview}
-                            >📖 일기 돌아보기</Button>
-                        </div>
-
-                    </Col>
-                </Row>*/}
                 <span className="center_temp">
-                                                &nbsp;
+                    &nbsp;
 
                     <Row xs={1} md={2} className="g-4">
 
@@ -391,7 +363,8 @@ function Loading_complete(props) {
                             <Card.Body>
                                 <Card.Title><b>개인정보는 어떻게 관리되나요?</b></Card.Title>
                                 <Card.Text>
-                                    나의 데이터는 어떻게 관리되는지 알아봅니다.</Card.Text>
+                                    나의 데이터는 어떻게 관리되는지 알아봅니다.
+                                </Card.Text>
                             </Card.Body>
                         </Card>
                     </Col>
