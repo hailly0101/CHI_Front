@@ -3,12 +3,9 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";  // Firebase Authentication
 import { getFirestore } from "firebase/firestore";  // Firebase Firestore
-import { getMessaging } from "firebase/messaging"; 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getMessaging, getToken, isSupported } from "firebase/messaging";
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyA5As5BKbHxAtQLSbpB6wme_2Z0V57LpPU",
   authDomain: "pocketmind-ed11e.firebaseapp.com",
@@ -23,22 +20,30 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);  // Firebase Authentication
-const db = getFirestore(app);  // Firebase 
-const messaging = getMessaging(app)
+const db = getFirestore(app);  // Firebase Firestore
+const messaging = getMessaging(app);
 const provider = new GoogleAuthProvider();
 
-if (await isSupported()) {
-  const messaging = getMessaging(firebaseApp);
-
-  getToken(messaging, { vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o' }).then((currentToken) => {
-    if (currentToken) {
-      console.log('Current token for client:', currentToken);
-    } else {
-      console.log('No registration token available.');
+// 비동기 작업을 함수로 분리
+async function requestNotificationPermission() {
+  if (await isSupported()) {
+    try {
+      const currentToken = await getToken(messaging, { vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o' });
+      if (currentToken) {
+        console.log('Current token for client:', currentToken);
+      } else {
+        console.log('No registration token available.');
+      }
+    } catch (err) {
+      console.error('An error occurred while retrieving token.', err);
     }
-  }).catch((err) => {
-    console.error('An error occurred while retrieving token.', err);
-  });
+  } else {
+    console.log('Firebase messaging is not supported on this browser.');
+  }
+}
 
+// 비동기 작업 실행
+requestNotificationPermission();
 
+// 최상위 레벨에서 export
 export { messaging, auth, db, provider };
