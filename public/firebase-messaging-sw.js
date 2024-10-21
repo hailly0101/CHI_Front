@@ -12,6 +12,7 @@ firebase.initializeApp({
     appId: "1:693520526870:web:a8d02e8a0bd9dd36904f37",
     measurementId: "G-RFFY3FL876"
 });
+const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage(function(payload) {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
