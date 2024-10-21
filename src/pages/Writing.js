@@ -293,8 +293,13 @@ function Writing(props) {
     
             if (patientDoc.exists()) {
                 // 문서가 존재할 경우 담당 의사 정보 가져오기
-                const doctorEmail = patientDoc.data().doctor;  // 담당 의사 이메일
-                return doctorEmail;  
+                const doctorEmail = patientDoc.data().doctor;
+                if (Array.isArray(doctorEmail)) {
+                    console.warn("doctorEmail is an array. Only the first doctor email will be used.");
+                    return doctorEmail[0];  // 배열이면 첫 번째 이메일만 사용
+                }
+                return doctorEmail;   // 담당 의사 이메일
+ 
             } else {
                 console.error("해당 환자의 문서가 존재하지 않습니다.");
                 return null;
