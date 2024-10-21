@@ -107,6 +107,7 @@ function Home(props) {
             
             // 알림 권한 요청
             const permission = await Notification.requestPermission();
+            console.log(permission)
     
             if (permission === "granted") {
                 // FCM 토큰 요청
