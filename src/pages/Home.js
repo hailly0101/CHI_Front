@@ -38,6 +38,7 @@ if ('serviceWorker' in navigator) {
 function Home(props) {
 
     const navigate = useNavigate();
+    const [user, setUser] = useState(null);
     const [diaryList, setDiaryList] = useState([]);
     const updateProgress = useRef(true);
     const [emptyList, setEmptyList] = useState(false);
