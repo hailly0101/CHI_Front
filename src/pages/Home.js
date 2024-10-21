@@ -114,7 +114,8 @@ function Home(props) {
                 const token = await getToken(messaging, {
                     vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o'
                 });
-    
+                console.log("토큰출력")
+                console.log(token)
                 if (token) {
                     console.log('FCM Token generated:', token);
     
