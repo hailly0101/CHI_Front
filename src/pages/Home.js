@@ -20,7 +20,7 @@ import {
     updateDoc
 } from "firebase/firestore";
 import { getMessaging, getToken } from "firebase/messaging";  // FCM 관련 함수 추가
-import {db, app} from "../firebase-config";
+import {db, message} from "../firebase-config";
 import Button from "react-bootstrap/Button";
 
 function Home(props) {
@@ -58,7 +58,6 @@ function Home(props) {
                 navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' })
                     .then((registration) => {
                         console.log('Service Worker registered with scope:', registration.scope);
-                        const messaging = getMessaging();
                         messaging.useServiceWorker(registration);
                     })
                     .catch((error) => {
@@ -103,7 +102,6 @@ function Home(props) {
         try {
             console.log("messaging 객체 초기화")
             // FCM Messaging 객체 초기화
-            const messaging = getMessaging(app);
             console.log(messaging)
             // 알림 권한 요청
             const permission = await Notification.requestPermission();

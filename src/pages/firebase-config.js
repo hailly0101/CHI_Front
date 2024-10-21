@@ -23,6 +23,7 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);  // Firebase Authentication
 const db = getFirestore(app);  // Firebase 
+const messaging = getMessaging(app)
 const provider = new GoogleAuthProvider();
 
-export { app, auth, db, provider };
+export { messaging, auth, db, provider };
