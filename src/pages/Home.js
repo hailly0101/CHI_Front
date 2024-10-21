@@ -55,9 +55,11 @@ function Home(props) {
         // 서비스 워커 등록
         useEffect(() => {
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/firebase-messaging-sw.js')
+                navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' })
                     .then((registration) => {
                         console.log('Service Worker registered with scope:', registration.scope);
+                        const messaging = getMessaging();
+                        messaging.useServiceWorker(registration);
                     })
                     .catch((error) => {
                         console.error('Service Worker registration failed:', error);
@@ -98,10 +100,21 @@ function Home(props) {
 
     // FCM 토큰을 생성하고, 백엔드에 전송하는 함수
     async function handleFCMToken(userEmail, userType) {
+
         try {
             const messaging = getMessaging();
-            const token = await getToken(messaging, { vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o' });
+            const permission = await Notification.requestPermission();
 
+            if (permission === "granted") {
+                const token = await getToken(messaging, {
+                    vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o'
+                });
+            } else if (permission === "denied") {
+                alert(
+                    "web push 권한이 차단되었습니다. 알림을 사용하시려면 권한을 허용해주세요"
+                );
+            }
+            console.log(token)
             if (token) {
                 console.log('FCM Token generated:', token);
 
