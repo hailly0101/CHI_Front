@@ -100,49 +100,51 @@ function Home(props) {
 
     // FCM 토큰을 생성하고, 백엔드에 전송하는 함수
     async function handleFCMToken(userEmail, userType) {
-
         try {
+            // FCM Messaging 객체 초기화
             const messaging = getMessaging();
+            
+            // 알림 권한 요청
             const permission = await Notification.requestPermission();
-
+    
             if (permission === "granted") {
+                // FCM 토큰 요청
                 const token = await getToken(messaging, {
                     vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o'
                 });
-            } else if (permission === "denied") {
-                alert(
-                    "web push 권한이 차단되었습니다. 알림을 사용하시려면 권한을 허용해주세요"
-                );
-            }
-            console.log(token)
-            if (token) {
-                console.log('FCM Token generated:', token);
-
-                // FCM 토큰을 백엔드로 전송
-                const response = await fetch("https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/fcm/register-fcm-token", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: userEmail,
-                        userType: userType,  // 'doctor' 또는 'patient'
-                        fcmToken: token,
-                    }),
-                });
-
-                if (!response.ok) {
-                    console.error('Error registering FCM token:', await response.text());
+    
+                if (token) {
+                    console.log('FCM Token generated:', token);
+    
+                    // FCM 토큰을 백엔드로 전송
+                    const response = await fetch("https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/fcm/register-fcm-token", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            email: userEmail,
+                            userType: userType,  // 'doctor' 또는 'patient'
+                            fcmToken: token,
+                        }),
+                    });
+    
+                    if (!response.ok) {
+                        console.error('Error registering FCM token:', await response.text());
+                    } else {
+                        console.log('FCM token successfully sent to backend');
+                    }
                 } else {
-                    console.log('FCM token successfully sent to backend');
+                    console.log('No FCM token available.');
                 }
-            } else {
-                console.log('No FCM token available.');
+            } else if (permission === "denied") {
+                alert("web push 권한이 차단되었습니다. 알림을 사용하시려면 권한을 허용해주세요");
             }
         } catch (error) {
             console.error('Error handling FCM token:', error);
         }
     }
+    
 
     function navigateToWriting() {
         navigate("/writing");
