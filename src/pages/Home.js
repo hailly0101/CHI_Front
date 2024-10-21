@@ -109,7 +109,8 @@ function Home(props) {
             const permission = await Notification.requestPermission();
             console.log(permission)
     
-            if (permission === "granted") {
+            if (permission == "granted") {
+                console.log("토큰출력")
                 // FCM 토큰 요청
                 const token = await getToken(messaging, {
                     vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o'
