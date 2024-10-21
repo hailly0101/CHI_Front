@@ -312,7 +312,7 @@ function Writing(props) {
 
 
     }   
-    async function getRelatedEmail(props) {
+    async function getRelatedEmail() {
         try {
             console.log("getRelatedEmail");
             console.log(props.userEmail);
@@ -326,7 +326,7 @@ function Writing(props) {
                     // 문서가 존재할 경우 담당 의사 정보 가져오기
                     const doctorEmail = patientDoc.data().doctor;
                         console.log(doctorEmail[0]);
-                        return doctorEmail[0];  // 배열이면 첫 번째 이메일만 사용
+                        return "doctor";  // 배열이면 첫 번째 이메일만 사용
                 } else {
                     console.error("해당 환자 담당, 의사 문서가 존재하지 않습니다.");
                     return null;
@@ -410,7 +410,7 @@ function Writing(props) {
         // navigateToReview()
 
         // Firestore에서 담당 의사, 관련 환자 정보를 가져옴
-        const relatedEmail = await getRelatedEmail({ userEmail: props.userEmail, userType: props.userType });
+        const relatedEmail = await getRelatedEmail();
     
         if (relatedEmail) {
             await sendDiaryNotificationToBackend(relatedEmail, diary);  // 담당 의사의 이메일과 일기내용 전달
