@@ -94,6 +94,7 @@ function Writing(props) {
                 }
             } catch (error) {
                 console.error("사용자 유형을 가져오는 중 오류 발생:", error);
+                setUserType("patient")
             }
         }
     
@@ -313,6 +314,9 @@ function Writing(props) {
     }   
     async function getRelatedEmail(userEmail, userType) {
         try {
+            console.log("getRelatedEmail");
+            console.log(userEmail);
+            console.log(userType);
             if (userType === "patient") {
                 // 'patient' 컬렉션에서 환자의 이메일을 사용하여 문서를 가져옴
                 const patientDocRef = doc(db, 'patient', userEmail);
@@ -321,6 +325,7 @@ function Writing(props) {
                 if (patientDoc.exists()) {
                     // 문서가 존재할 경우 담당 의사 정보 가져오기
                     const doctorEmail = patientDoc.data().doctor;
+                        console.log(doctorEmail[0]);
                         return doctorEmail[0];  // 배열이면 첫 번째 이메일만 사용
                 } else {
                     console.error("해당 환자 담당, 의사 문서가 존재하지 않습니다.");
@@ -334,12 +339,14 @@ function Writing(props) {
                 if (doctorDoc.exists()) {
                     // 문서가 존재할 경우 담당 환자 목록 가져오기
                     const patientEmail = doctorDoc.data().patient;
+                        console.log(patientEmail[0]);
                         return patientEmail[0];  // 환자 이메일 반환
                 } else {
                     console.error("해당 의사 관련, 환자의 문서가 존재하지 않습니다.");
                     return null;
                 }
             } else {
+                console.log(props.userType);
                 console.error("올바른 userType을 전달해주세요. 'patient' 또는 'doctor'만 가능합니다.");
                 return null;
             }
