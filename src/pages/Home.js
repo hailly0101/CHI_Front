@@ -1,4 +1,5 @@
 import {React, useEffect, useRef, useState} from "react";
+import { getAuth, onAuthStateChanged } from "firebase/auth"; // Firebase Authentication 추가
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -42,6 +43,22 @@ function Home(props) {
     const [emptyList, setEmptyList] = useState(false);
     const [lastDate, setLastDate] = useState("");
     const [userType, setUserType] = useState(null);  // 의사 또는 환자 정보 저장
+
+    const auth = getAuth();  // Firebase 인증 객체
+
+    // 사용자 로그인 상태 확인
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUser(user);  // 사용자가 로그인되어 있을 때 상태 저장
+                console.log('User logged in:', user.email);
+            } else {
+                console.log('No user is logged in.');
+            }
+        });
+
+        return () => unsubscribe();
+    }, [auth]);
 
     // 사용자 유형을 Firestore에서 확인하여 의사 또는 환자 구분
     useEffect(() => {
