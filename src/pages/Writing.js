@@ -46,7 +46,7 @@ function Writing(props) {
     const updateProgress = useRef(true)
     let [surveyReady, setSurveyReady] = useState(false)
     const [conversation, setConversation] = useState([]);
-    const [userType, setUserType] = useState(null);
+    const [userType, setUserType] = useState("patient");
     const [userMail, setUserMail] = useState(null);
 
     const diaryRequest = useRef(false)
@@ -323,6 +323,12 @@ function Writing(props) {
 
     }   
     async function getRelatedEmail(userMail, userType) {
+        if (!userType) {
+            console.error("들어온 변수가 없네요");
+            userType = "patient"
+        }
+        console.log("Fetching related email for:", userMail, userType);
+
         try {
             console.log("getRelatedEmail");
             console.log("props");
