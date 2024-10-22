@@ -18,6 +18,18 @@ messaging.onBackgroundMessage((m) => {
   console.log("onBackgroundMessage", m);
 });
 
+messaging.onTokenRefresh(function() {
+	messaging.getToken()
+	.then(function(refreshedToken) {
+		console.log(refreshedToken);
+		console.log('Token refreshed.');
+	})
+	.catch(function(err) {
+		console.log('Unable to retrieve refreshed token ', err);
+	});
+});
+
+
 // messaging.onBackgroundMessage(function(payload) {
 //   console.log('[firebase-messaging-sw.js] Received background message ', payload);
 //   const notificationTitle = payload.notification.title;
