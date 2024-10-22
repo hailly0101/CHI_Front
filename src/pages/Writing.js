@@ -262,12 +262,22 @@ function Writing(props) {
                 console.log("FCM 토큰 요청 중...");
                 console.log("라이팅-메시징");
                 console.log(messaging);
+
+                messaging.deleteToken().then(() => {
+                    return messaging.getToken();
+                }).then((newToken) => {
+                    console.log('New FCM Token:', newToken);
+                    // 백엔드에 새로운 토큰을 저장
+                }).catch((err) => {
+                    console.error('Unable to retrieve refreshed token: ', err);
+                });
     
                 getToken(messaging, {
                     vapidKey: 'BHxLI9MyVyff7V0GVCp4n6sxF3LwarXbJHHbx1wO2SSil7bgJMy0AiYhONPMrMFpYZ2G6FyDO_AYmHqs-sDJ4p0'
                 }).then((currentToken) => {
                     if (currentToken) {
-                        console.log('new FCM Token generated:', currentToken);
+                        const cleanedToken = currentToken.startsWith('deD-') ? currentToken.substring(4) : currentToken;
+                        console.log('Cleaned FCM Token:', cleanedToken);
     
                         // Send the token to your backend server
                         fetch("https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/fcm/register-fcm-token", {
@@ -278,7 +288,7 @@ function Writing(props) {
                             body: JSON.stringify({
                                 email: userEmail,
                                 userType: userType,  // 'doctor' 또는 'patient'
-                                fcmToken: currentToken,
+                                fcmToken: cleanedToken,
                             }),
                         })
                         .then(response => {
