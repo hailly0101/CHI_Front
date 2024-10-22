@@ -22,7 +22,7 @@ import {useNavigate} from "react-router-dom";
 import Modal from 'react-bootstrap/Modal';
 import {ToastContainer} from "react-bootstrap";
 import Likert from 'react-likert-scale';
-import { getToken, onNewToken } from "firebase/messaging";
+import { getToken } from "firebase/messaging";
 import book_blue from "../img/book_blue.jpg";
 import book_purple from "../img/book_purple.jpg";
 import chat from "../img/chat.jpg";
@@ -257,51 +257,49 @@ function Writing(props) {
     async function handleFCMToken(userEmail, userType) {
         try {
             const permission = await Notification.requestPermission();
+    
             if (permission === "granted") {
                 console.log("FCM 토큰 요청 중...");
                 console.log("라이팅-메시징");
                 console.log(messaging);
-                
-                onNewToken(messaging, async () => {
-                    console.log("FCM token is being refreshed...");
-                    
-                    getToken(messaging, {
-                        vapidKey: 'BHxLI9MyVyff7V0GVCp4n6sxF3LwarXbJHHbx1wO2SSil7bgJMy0AiYhONPMrMFpYZ2G6FyDO_AYmHqs-sDJ4p0'
-                    }).then((currentToken) => {
-                        if (currentToken) {
-                            console.log('new FCM Token generated:', currentToken);
     
-                            // Send the token to your backend server
-                            fetch("https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/fcm/register-fcm-token", {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                    email: userEmail,
-                                    userType: userType,  // 'doctor' 또는 'patient'
-                                    fcmToken: currentToken,
-                                }),
-                            })
-                            .then(response => {
-                                if (!response.ok) {
-                                    console.error('Error registering FCM token:', response.statusText);
-                                } else {
-                                    console.log('FCM token successfully sent to backend');
-                                }
-                            })
-                            .catch(err => {
-                                console.error('Error sending FCM token to backend:', err);
-                            });
+                getToken(messaging, {
+                    vapidKey: 'BHxLI9MyVyff7V0GVCp4n6sxF3LwarXbJHHbx1wO2SSil7bgJMy0AiYhONPMrMFpYZ2G6FyDO_AYmHqs-sDJ4p0'
+                }).then((currentToken) => {
+                    if (currentToken) {
+                        console.log('new FCM Token generated:', currentToken);
     
-                        } else {
-                            console.log('No registration token available. Request permission to generate one.');
-                        }
-                    })
-                    .catch((err) => {
-                        console.error('An error occurred while retrieving token: ', err);
-                    });
+                        // Send the token to your backend server
+                        fetch("https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/fcm/register-fcm-token", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                email: userEmail,
+                                userType: userType,  // 'doctor' 또는 'patient'
+                                fcmToken: currentToken,
+                            }),
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                console.error('Error registering FCM token:', response.statusText);
+                            } else {
+                                console.log('FCM token successfully sent to backend');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error sending FCM token to backend:', err);
+                        });
+    
+                    } else {
+                        console.log('No registration token available. Request permission to generate one.');
+                    }
+                })
+                .catch((err) => {
+                    console.error('An error occurred while retrieving token: ', err);
                 });
+    
             } else if (permission === "denied") {
                 alert("Web push 권한이 차단되었습니다. 알림을 사용하시려면 권한을 허용해주세요.");
             } else {
@@ -311,6 +309,8 @@ function Writing(props) {
             console.error('Error handling FCM token:', error);
         }
     }
+        
+                    
     
     
 
