@@ -192,7 +192,13 @@ function Writing(props) {
         }
     
         fetchUserType();
-    }, [props.userMail, props.userMail]);
+    }, [props.userMail, props.userType]);
+
+    useEffect(() => {
+        if (userType) {
+            console.log("새로고침 user type :", userType);  // 여기에서 userType을 참조
+        }
+    }, [userType]);
 
     function ChatBox({ conversation, textInput, setTextInput, addConversationFromUser, toggleListening, isListening }) {
         return (
