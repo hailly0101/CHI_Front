@@ -323,21 +323,14 @@ function Writing(props) {
 
     }   
     async function getRelatedEmail(userMail, userType) {
-        if (!userType) {
-            console.error("들어온 변수가 없네요");
-            userType = "patient"
-        }
         console.log("Fetching related email for:", userMail, userType);
 
         try {
             console.log("getRelatedEmail");
-            console.log("props");
-            console.log(props.userMail);
-            console.log(props.userType);
             console.log("그냥");
             console.log(userMail);
             console.log(userType);
-            if (props.userType === "patient") {
+            if (userType === "patient") {
                 // 'patient' 컬렉션에서 환자의 이메일을 사용하여 문서를 가져옴
                 const patientDocRef = doc(db, 'patient', props.userMail);
                 const patientDoc = await getDoc(patientDocRef);
@@ -351,7 +344,7 @@ function Writing(props) {
                     console.error("해당 환자 담당, 의사 문서가 존재하지 않습니다.");
                     return null;
                 }
-            } else if (props.userType === "doctor") {
+            } else if (userType === "doctor") {
                 // 'doctor' 컬렉션에서 의사의 이메일을 사용하여 문서를 가져옴
                 const doctorDocRef = doc(db, 'doctor', props.userMail);
                 const doctorDoc = await getDoc(doctorDocRef);
@@ -366,7 +359,7 @@ function Writing(props) {
                     return null;
                 }
             } else {
-                console.log(props.userType);
+                console.log(userType);
                 console.error("올바른 userType을 전달해주세요. 'patient' 또는 'doctor'만 가능합니다.");
                 return null;
             }
