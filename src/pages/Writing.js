@@ -74,32 +74,6 @@ function Writing(props) {
     const [pocketMindDiagnosis, setPocketMindDiagnosis] = useState(''); // Pocket-mind 진단 상태
     const [showDiagnosisModal, setShowDiagnosisModal] = useState(false);  // 모달 열기/닫기 상태
 
-    // 사용자 유형을 Firestore에서 확인하여 의사 또는 환자 구분
-    useEffect(() => {
-        async function fetchUserType() {
-            try {
-                console.log("Fetching user type for:", props.userMail);  // 디버깅 로그 추가
-    
-                // 의사 컬렉션에서 해당 이메일 문서를 조회
-                const userDocRef = doc(db, "doctor", props.userMail);
-                const userDoc = await getDoc(userDocRef);
-    
-                if (userDoc.exists()) {
-                    setUserType("doctor");
-                    console.log("의사 계정입니다. 이메일: ", props.userMail);
-                } else {
-                    // 환자일 가능성이 있으므로 환자 컬렉션에서도 확인
-                    setUserType("patient");
-                    console.log("환자 계정입니다. 이메일: ", props.userMail);
-                }
-            } catch (error) {
-                console.error("사용자 유형을 가져오는 중 오류 발생:", error);
-                setUserType("patient")
-            }
-        }
-    
-        fetchUserType();
-    }, [props.userMail]);
 
     // 모달 열기/닫기 함수
     const handleShowDiagnosisModal = () => setShowDiagnosisModal(true);
@@ -189,6 +163,33 @@ function Writing(props) {
             };
         }
     });
+    // 사용자 유형을 Firestore에서 확인하여 의사 또는 환자 구분
+    useEffect(() => {
+
+        async function fetchUserType() {
+            try {
+                console.log("Fetching user type for:", props.userMail);  // 디버깅 로그 추가
+    
+                // 의사 컬렉션에서 해당 이메일 문서를 조회
+                const userDocRef = doc(db, "doctor", props.userMail);
+                const userDoc = await getDoc(userDocRef);
+    
+                if (userDoc.exists()) {
+                    setUserType("doctor");
+                    console.log("의사 계정입니다. 이메일: ", props.userMail);
+                } else {
+                    // 환자일 가능성이 있으므로 환자 컬렉션에서도 확인
+                    setUserType("patient");
+                    console.log("환자 계정입니다. 이메일: ", props.userMail);
+                }
+            } catch (error) {
+                console.error("사용자 유형을 가져오는 중 오류 발생:", error);
+                setUserType("patient")
+            }
+        }
+    
+        fetchUserType();
+    }, [props.userMail]);
 
     function ChatBox({ conversation, textInput, setTextInput, addConversationFromUser, toggleListening, isListening }) {
         return (
@@ -312,7 +313,7 @@ function Writing(props) {
 
 
     }   
-    async function getRelatedEmail() {
+    async function getRelatedEmail(props) {
         try {
             console.log("getRelatedEmail");
             console.log(props.userEmail);
@@ -410,7 +411,7 @@ function Writing(props) {
         // navigateToReview()
 
         // Firestore에서 담당 의사, 관련 환자 정보를 가져옴
-        const relatedEmail = await getRelatedEmail();
+        const relatedEmail = await getRelatedEmail({ userEmail: props.userEmail, userType: props.userType });
     
         if (relatedEmail) {
             await sendDiaryNotificationToBackend(relatedEmail, diary);  // 담당 의사의 이메일과 일기내용 전달
