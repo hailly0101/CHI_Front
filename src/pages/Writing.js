@@ -326,10 +326,6 @@ function Writing(props) {
         console.log("Fetching related email for:", userMail, userType);
 
         try {
-            console.log("getRelatedEmail");
-            console.log("그냥");
-            console.log(userMail);
-            console.log(userType);
             if (userType === "patient") {
                 // 'patient' 컬렉션에서 환자의 이메일을 사용하여 문서를 가져옴
                 const patientDocRef = doc(db, 'patient', props.userMail);
@@ -339,7 +335,7 @@ function Writing(props) {
                     // 문서가 존재할 경우 담당 의사 정보 가져오기
                     const doctorEmail = patientDoc.data().doctor;
                         console.log(doctorEmail[0]);
-                        return "doctor";  // 배열이면 첫 번째 이메일만 사용
+                        return doctorEmail[0];  // 배열이면 첫 번째 이메일만 사용
                 } else {
                     console.error("해당 환자 담당, 의사 문서가 존재하지 않습니다.");
                     return null;
@@ -381,7 +377,7 @@ function Writing(props) {
                 ? `${props.userMail} 환자 일기 알림`  // 환자가 접속한 경우 담당 의사에게 보낼 제목 (환자 이메일 포함)
                 : '새로운 피드백 알림';  // 의사가 접속한 경우 환자에게 보낼 제목
         
-            const notificationBody = props.userType === "patient" 
+            const notificationBody = props.userType === "doctor" 
                 ? `${props.userMail} 환자가 새로운 일기를 작성했습니다: ${diaryContent.slice(0, 20)}...`  // 환자가 접속했으니 의사에게 보낼 메시지 (환자 이메일 포함)
                 : `의사가 새로운 피드백을 남겼습니다`;  // 의사가 접속했으니 환자에게 보낼 피드백 메시지
 
@@ -422,7 +418,6 @@ function Writing(props) {
         }, {merge: true});
         // navigateToReview()
         console.log("submitDiary");
-        console.log(props.userType);
         console.log(userType);
 
         // Firestore에서 담당 의사, 관련 환자 정보를 가져옴
