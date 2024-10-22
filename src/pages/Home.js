@@ -20,7 +20,7 @@ import {
     setDoc,
     updateDoc
 } from "firebase/firestore";
-import { getToken } from "firebase/messaging";  // FCM 관련 함수 추가
+import { getToken, onTokenRefresh} from "firebase/messaging";  // FCM 관련 함수 추가
 import {app, db, messaging} from "../firebase-config.js";
 import Button from "react-bootstrap/Button";
 
@@ -82,6 +82,8 @@ function Home(props) {
     }, [props.userMail]);
 
     
+
+    
     useEffect(() => {
         async function renewList() {
             console.log("renewList 함수 실행");  // 디버깅 로그 추가
@@ -112,7 +114,7 @@ function Home(props) {
     
     }, [userType]);  // userType이 변경될 때마다 실행
     
-    getToken(messaging, { vapidKey: 'Ud_cMm29hcY8LmlFgGWYSc3p6RehpWOHXdTyZb_HZ1o' }).then((currentToken) => {
+    getToken(messaging, { vapidKey: 'BHxLI9MyVyff7V0GVCp4n6sxF3LwarXbJHHbx1wO2SSil7bgJMy0AiYhONPMrMFpYZ2G6FyDO_AYmHqs-sDJ4p0' }).then((currentToken) => {
         if (currentToken) {
           console.log('Current token for client:', currentToken);
         } else {

@@ -7,7 +7,7 @@ import {
     onSnapshot,
     getCountFromServer, updateDoc, arrayUnion, increment, query, where, orderBy, getDocs
 } from 'firebase/firestore'
-import {db} from "../firebase-config";
+import {app, db, messaging} from "../firebase-config";
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -22,12 +22,22 @@ import {useNavigate} from "react-router-dom";
 import Modal from 'react-bootstrap/Modal';
 import {ToastContainer} from "react-bootstrap";
 import Likert from 'react-likert-scale';
-
+import { getToken, onTokenRefresh } from "firebase/messaging";
 import book_blue from "../img/book_blue.jpg";
 import book_purple from "../img/book_purple.jpg";
 import chat from "../img/chat.jpg";
 import lock from "../img/lock.jpg";
+import { getAuth, onAuthStateChanged } from "firebase/auth"; // Firebase Authentication 추가
 
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+        .register("/firebase-messaging-sw.js").then((registration) => {
+            console.log('Service Worker registered with scope:', registration.scope);
+        })
+        .catch((error) => {
+            console.error('Service Worker registration failed:', error);
+        });
+}
 
 function Writing(props) {
     const [show, setShow] = useState(false);
@@ -83,6 +93,22 @@ function Writing(props) {
         // 모달을 닫을 때 화면 전환을 처리
         navigateToReview();  // 모달이 닫힌 후에 화면 이동
     };
+
+    const auth = getAuth();  // Firebase 인증 객체
+
+    // 사용자 로그인 상태 확인
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUser(user);  // 사용자가 로그인되어 있을 때 상태 저장
+                console.log('User logged in:', user.email);
+            } else {
+                console.log('No user is logged in.');
+            }
+        });
+
+        return () => unsubscribe();
+    }, [auth]);
 
     // const [counselorResponse, setCounselorResponse] = useState(''); // 상담사 답변 기록
     // const [doctorResponse, setDoctorResponse] = useState(''); // 의사 답변 기록
@@ -214,6 +240,78 @@ function Writing(props) {
             </div>
         );
     }
+    
+    useEffect(() => {
+        // userType이 설정된 후에 FCM 토큰 처리
+        console.log("userType 상태 확인:", userType);  // userType 상태 확인용 로그 추가
+        if (userType) {
+            console.log("FCM 토큰 처리 시작", userType);  // 조건 진입 여부 디버깅 로그 추가
+            handleFCMToken(props.userMail, userType);
+        } else {
+            console.log("userType이 아직 설정되지 않음");  // userType이 설정되지 않은 경우 로그 추가
+        }
+    
+    }, [userType]);  // userType이 변경될 때마다 실행
+    
+    // FCM 토큰을 생성하고, 백엔드에 전송하는 함수
+    async function handleFCMToken(userEmail, userType) {
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission === "granted") {
+                console.log("FCM 토큰 요청 중...");
+                console.log("라이팅-메시징");
+                console.log(messaging);
+                
+                onTokenRefresh(messaging, async () => {
+                    console.log("FCM token is being refreshed...");
+                    
+                    getToken(messaging, {
+                        vapidKey: 'BHxLI9MyVyff7V0GVCp4n6sxF3LwarXbJHHbx1wO2SSil7bgJMy0AiYhONPMrMFpYZ2G6FyDO_AYmHqs-sDJ4p0'
+                    }).then((currentToken) => {
+                        if (currentToken) {
+                            console.log('new FCM Token generated:', currentToken);
+    
+                            // Send the token to your backend server
+                            fetch("https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/fcm/register-fcm-token", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    email: userEmail,
+                                    userType: userType,  // 'doctor' 또는 'patient'
+                                    fcmToken: currentToken,
+                                }),
+                            })
+                            .then(response => {
+                                if (!response.ok) {
+                                    console.error('Error registering FCM token:', response.statusText);
+                                } else {
+                                    console.log('FCM token successfully sent to backend');
+                                }
+                            })
+                            .catch(err => {
+                                console.error('Error sending FCM token to backend:', err);
+                            });
+    
+                        } else {
+                            console.log('No registration token available. Request permission to generate one.');
+                        }
+                    })
+                    .catch((err) => {
+                        console.error('An error occurred while retrieving token: ', err);
+                    });
+                });
+            } else if (permission === "denied") {
+                alert("Web push 권한이 차단되었습니다. 알림을 사용하시려면 권한을 허용해주세요.");
+            } else {
+                console.log('No registration token available. Request permission to generate one.');
+            }
+        } catch (error) {
+            console.error('Error handling FCM token:', error);
+        }
+    }
+    
     
 
     async function receiveSessionData() {
@@ -377,7 +475,7 @@ function Writing(props) {
                 ? `${props.userMail} 환자 일기 알림`  // 환자가 접속한 경우 담당 의사에게 보낼 제목 (환자 이메일 포함)
                 : '새로운 피드백 알림';  // 의사가 접속한 경우 환자에게 보낼 제목
         
-            const notificationBody = userType === "doctor" 
+            const notificationBody = userType === "patient"
                 ? `${props.userMail} 환자가 새로운 일기를 작성했습니다: ${diaryContent.slice(0, 20)}...`  // 환자가 접속했으니 의사에게 보낼 메시지 (환자 이메일 포함)
                 : `의사가 새로운 피드백을 남겼습니다`;  // 의사가 접속했으니 환자에게 보낼 피드백 메시지
 
