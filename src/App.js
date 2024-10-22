@@ -6,6 +6,8 @@ import Navbar from 'react-bootstrap/Navbar';
 import Stack from 'react-bootstrap/Stack';
 import {Routes, Route, useNavigate,} from 'react-router-dom';
 
+import { messaging } from './firebase-config';
+
 import Auth from './pages/Auth';
 import Cookies from 'universal-cookie';
 import {signOut} from 'firebase/auth';
@@ -15,11 +17,37 @@ import Writing from "./pages/Writing";
 import Loading from "./pages/Loading";
 import DiaryList from "./pages/DiaryList";
 import Home from "./pages/Home";
-import {collection, doc, getDoc} from "firebase/firestore";
+import {collection, connectFirestoreEmulator, doc, getDoc} from "firebase/firestore";
+import { getToken } from 'firebase/messaging';
 
 const cookies = new Cookies();
 
 function App() {
+    useEffect(() => {
+        async function requestPermission() {
+            console.log("권한 요청 중...");
+            const permission = await Notification.requestPermission();
+            if (permission === "granted") {
+                console.log("알림 권한이 허용됨");
+                try {
+                    const currentToken = getToken(messaging, {
+                        vapidKey: 'BHxLI9MyVyff7V0GVCp4n6sxF3LwarXbJHHbx1wO2SSil7bgJMy0AiYhONPMrMFpYZ2G6FyDO_AYmHqs-sDJ4p0'
+                        
+                    });
+                    console.log(currentToken)
+
+
+                } catch (error) {
+                    console.error("Error getting token", error);
+                }
+            } else {
+                console.log("알림 권한 허용 안함")
+            }
+            
+        }
+
+        requestPermission();
+    }, []);
 
     let navigate = useNavigate()
 

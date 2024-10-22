@@ -20,7 +20,7 @@ import {
     setDoc,
     updateDoc
 } from "firebase/firestore";
-import { getToken, onTokenRefresh} from "firebase/messaging";  // FCM 관련 함수 추가
+import { getToken  } from "firebase/messaging";  // FCM 관련 함수 추가
 import {app, db, messaging} from "../firebase-config.js";
 import Button from "react-bootstrap/Button";
 
