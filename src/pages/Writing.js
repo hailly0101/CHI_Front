@@ -47,7 +47,7 @@ function Writing(props) {
     let [surveyReady, setSurveyReady] = useState(false)
     const [conversation, setConversation] = useState([]);
     const [userType, setUserType] = useState(null);
-    const [userEmail, setUserEmail] = useState(null);
+    const [userMail, setUserMail] = useState(null);
 
     const diaryRequest = useRef(false)
 
@@ -178,10 +178,12 @@ function Writing(props) {
                 if (userDoc.exists()) {
                     setUserType("doctor");
                     console.log("의사 계정입니다. 이메일: ", props.userMail);
+                    console.log("Fetching user type for:", props.userType);  // 디버깅 로그 추가
                 } else {
                     // 환자일 가능성이 있으므로 환자 컬렉션에서도 확인
                     setUserType("patient");
                     console.log("환자 계정입니다. 이메일: ", props.userMail);
+                    console.log("Fetching user type for:", props.userType);  // 디버깅 로그 추가
                 }
             } catch (error) {
                 console.error("사용자 유형을 가져오는 중 오류 발생:", error);
@@ -190,7 +192,7 @@ function Writing(props) {
         }
     
         fetchUserType();
-    }, [props.userMail]);
+    }, [props.userMail, props.userMail]);
 
     function ChatBox({ conversation, textInput, setTextInput, addConversationFromUser, toggleListening, isListening }) {
         return (
@@ -318,14 +320,14 @@ function Writing(props) {
         try {
             console.log("getRelatedEmail");
             console.log("props");
-            console.log(props.userEmail);
+            console.log(props.userMail);
             console.log(props.userType);
             console.log("그냥");
             console.log(userMail);
             console.log(userType);
             if (props.userType === "patient") {
                 // 'patient' 컬렉션에서 환자의 이메일을 사용하여 문서를 가져옴
-                const patientDocRef = doc(db, 'patient', props.userEmail);
+                const patientDocRef = doc(db, 'patient', props.userMail);
                 const patientDoc = await getDoc(patientDocRef);
         
                 if (patientDoc.exists()) {
@@ -339,7 +341,7 @@ function Writing(props) {
                 }
             } else if (props.userType === "doctor") {
                 // 'doctor' 컬렉션에서 의사의 이메일을 사용하여 문서를 가져옴
-                const doctorDocRef = doc(db, 'doctor', props.userEmail);
+                const doctorDocRef = doc(db, 'doctor', props.userMail);
                 const doctorDoc = await getDoc(doctorDocRef);
         
                 if (doctorDoc.exists()) {
