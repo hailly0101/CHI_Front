@@ -136,10 +136,7 @@ function Home(props) {
                 getToken(messaging, {
                     vapidKey: 'BHxLI9MyVyff7V0GVCp4n6sxF3LwarXbJHHbx1wO2SSil7bgJMy0AiYhONPMrMFpYZ2G6FyDO_AYmHqs-sDJ4p0'
                 }).then((currentToken) => {
-                    if (currentToken) {
-                        const cleanedToken = currentToken.startsWith('deD-') ? currentToken.substring(4) : currentToken;
-                        console.log('Cleaned FCM Token:', cleanedToken);
-                        
+                    if (currentToken) {                        
                         console.log('FCM Token generated:', currentToken);
         
                         // Send the token to your backend server
@@ -151,7 +148,7 @@ function Home(props) {
                             body: JSON.stringify({
                                 email: userEmail,
                                 userType: userType,  // 'doctor' 또는 'patient'
-                                fcmToken: cleanedToken,
+                                fcmToken: currentToken,
                             }),
                         })
                         .then(response => {
