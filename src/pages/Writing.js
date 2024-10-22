@@ -374,7 +374,6 @@ function Writing(props) {
             console.log("Diary content (first 20 characters):", diaryContent.slice(0, 20));
             console.log(userType)
             const notificationTitle = userType === "patient"
-                co
                 ? `${props.userMail} 환자 일기 알림`  // 환자가 접속한 경우 담당 의사에게 보낼 제목 (환자 이메일 포함)
                 : '새로운 피드백 알림';  // 의사가 접속한 경우 환자에게 보낼 제목
         
