@@ -22,7 +22,7 @@ import {useNavigate} from "react-router-dom";
 import Modal from 'react-bootstrap/Modal';
 import {ToastContainer} from "react-bootstrap";
 import Likert from 'react-likert-scale';
-import { getToken, onTokenRefresh } from "firebase/messaging";
+import { getToken, onNewToken } from "firebase/messaging";
 import book_blue from "../img/book_blue.jpg";
 import book_purple from "../img/book_purple.jpg";
 import chat from "../img/chat.jpg";
@@ -262,7 +262,7 @@ function Writing(props) {
                 console.log("라이팅-메시징");
                 console.log(messaging);
                 
-                onTokenRefresh(messaging, async () => {
+                onNewToken(messaging, async () => {
                     console.log("FCM token is being refreshed...");
                     
                     getToken(messaging, {
