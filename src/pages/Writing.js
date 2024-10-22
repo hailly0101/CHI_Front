@@ -421,9 +421,12 @@ function Writing(props) {
             diary: diary
         }, {merge: true});
         // navigateToReview()
+        console.log("submitDiary");
+        console.log(props.userType);
+        console.log(userType);
 
         // Firestore에서 담당 의사, 관련 환자 정보를 가져옴
-        const relatedEmail = await getRelatedEmail(props.userMail, props.userType);
+        const relatedEmail = await getRelatedEmail(props.userMail, userType);
     
         if (relatedEmail) {
             await sendDiaryNotificationToBackend(relatedEmail, diary);  // 담당 의사의 이메일과 일기내용 전달
