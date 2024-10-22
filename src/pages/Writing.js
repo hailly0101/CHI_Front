@@ -58,7 +58,7 @@ function Writing(props) {
     const [conversation, setConversation] = useState([]);
     const [userType, setUserType] = useState("patient");
     const [userMail, setUserMail] = useState(null);
-
+    const [user, setUser] = useState(null);
     const diaryRequest = useRef(false)
 
     const [modalShow, setModalShow] = useState(false);
