@@ -47,6 +47,7 @@ function Writing(props) {
     let [surveyReady, setSurveyReady] = useState(false)
     const [conversation, setConversation] = useState([]);
     const [userType, setUserType] = useState(null);
+    const [userEmail, setUserEmail] = useState(null);
 
     const diaryRequest = useRef(false)
 
@@ -169,7 +170,7 @@ function Writing(props) {
         async function fetchUserType() {
             try {
                 console.log("Fetching user type for:", props.userMail);  // 디버깅 로그 추가
-    
+                console.log("Fetching user type for:", props.userType);  // 디버깅 로그 추가
                 // 의사 컬렉션에서 해당 이메일 문서를 조회
                 const userDocRef = doc(db, "doctor", props.userMail);
                 const userDoc = await getDoc(userDocRef);
@@ -313,11 +314,15 @@ function Writing(props) {
 
 
     }   
-    async function getRelatedEmail(props) {
+    async function getRelatedEmail(userMail, userType) {
         try {
             console.log("getRelatedEmail");
+            console.log("props");
             console.log(props.userEmail);
             console.log(props.userType);
+            console.log("그냥");
+            console.log(userMail);
+            console.log(userType);
             if (props.userType === "patient") {
                 // 'patient' 컬렉션에서 환자의 이메일을 사용하여 문서를 가져옴
                 const patientDocRef = doc(db, 'patient', props.userEmail);
@@ -411,7 +416,7 @@ function Writing(props) {
         // navigateToReview()
 
         // Firestore에서 담당 의사, 관련 환자 정보를 가져옴
-        const relatedEmail = await getRelatedEmail({ userEmail: props.userEmail, userType: props.userType });
+        const relatedEmail = await getRelatedEmail(props.userMail, props.userType);
     
         if (relatedEmail) {
             await sendDiaryNotificationToBackend(relatedEmail, diary);  // 담당 의사의 이메일과 일기내용 전달
