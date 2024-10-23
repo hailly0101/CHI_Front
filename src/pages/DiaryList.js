@@ -21,6 +21,9 @@ import {
 
 import { db } from "../firebase-config";
 
+
+
+
 function DiaryList(props) {
     const [diaryList, setDiaryList] = useState([]);
     const updateProgress = useRef(true);
@@ -36,6 +39,14 @@ function DiaryList(props) {
     const [currentPrompt, setCurrentPrompt] = useState("");  // 프롬프트 상태 관리
     const [selectedPatientEmail, setSelectedPatientEmail] = useState(null); // 선택한 환자의 이메일
     const [selectedSessionNumber, setSelectedSessionNumber] = useState(null); // 선택한 세션 번호
+
+    // AI 진단 모달 상태 관리
+    const [showDiagnosisModal, setShowDiagnosisModal] = useState(false);
+    const [aiDiagnosis, setAIDiagnosis] = useState({
+        counselorDiagnosis: '',
+        doctorDiagnosis: '',
+        pocketMindDiagnosis: ''
+    });
 
     // 사용자 유형을 Firestore에서 확인하여 의사 또는 환자 구분
     useEffect(() => {
@@ -73,6 +84,33 @@ function DiaryList(props) {
             }
         }
     }, [userType]);  // userType이 변경될 때마다 실행
+
+    // AI 진단 결과 데이터를 Firestore에서 불러오는 함수
+    const fetchDiagnosisData = async (userMail, date) => {
+        const diagnosisDocRef = doc(db, "diagnosis", userMail, "dates", date);
+        const diagnosisDoc = await getDoc(diagnosisDocRef);
+        if (diagnosisDoc.exists()) {
+            const data = diagnosisDoc.data();
+            setAIDiagnosis({
+                counselorDiagnosis: data.counselorDiagnosis || '상담사 진단 없음',
+                doctorDiagnosis: data.doctorDiagnosis || '의사 진단 없음',
+                pocketMindDiagnosis: data.pocketMindDiagnosis || 'Pocket-Mind 진단 없음'
+            });
+        } else {
+            setAIDiagnosis({
+                counselorDiagnosis: '상담사 진단 없음',
+                doctorDiagnosis: '의사 진단 없음',
+                pocketMindDiagnosis: 'Pocket-Mind 진단 없음'
+            });
+        }
+        setShowDiagnosisModal(true);
+    };
+
+    const handleDiagnosisView = async (userMail, date) => {
+        await fetchDiagnosisData(userMail, date);
+    };
+
+
 
     const handlePromptEdit = async (patientEmail) => {
         setSelectedPatientEmail(patientEmail);
@@ -137,6 +175,14 @@ function DiaryList(props) {
             console.error("의사 또는 환자 정보를 가져오는 중 오류 발생:", error);
             return null;
         }
+    }
+
+    function Unix_timestamp_to_YYYYMMDD(t) {
+        const date = new Date(t * 1000); // Unix 타임스탬프를 Date 객체로 변환
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`; // "YYYY-MM-DD" 형식으로 반환
     }
     
     async function sendDiaryNotificationToBackend(email, Content) {
@@ -395,6 +441,12 @@ function DiaryList(props) {
                                                         </Button>
                                                         </div>
                                                     )}
+                                                    <Button
+                                                    variant="info"
+                                                    onClick={() => handleDiagnosisView(diary.patientEmail, Unix_timestamp_to_YYYYMMDD(diary["sessionEnd"]))}
+                                                    >
+                                                    이날의 AI 진단 보기
+                                                    </Button>
                                                 </Card.Subtitle>
                                                 <Card.Text>{diary["diary"]}</Card.Text>
                                                 <span className="likebutton" onClick={() => addLike(idx)}>️❤️</span> <b>{diary["like"]}</b>
