@@ -139,21 +139,19 @@ function DiaryList(props) {
         }
     }
     
-    
-
-    async function sendDiaryNotificationToBackend(email, diaryContent) {
+    async function sendDiaryNotificationToBackend(email, Content) {
         try {
             console.log("Starting to send notification to backend...");
             console.log("email:", email);
-            console.log("Diary content (first 20 characters):", diaryContent.slice(0, 20));
+            console.log("Diary content (first 20 characters):", Content.slice(0, 20));
             console.log(userType)
             const notificationTitle = userType === "patient"
                 ? `${props.userMail} 환자 일기 알림`  // 환자가 접속한 경우 담당 의사에게 보낼 제목 (환자 이메일 포함)
                 : '새로운 피드백 알림';  // 의사가 접속한 경우 환자에게 보낼 제목
         
             const notificationBody = userType === "patient"
-                ? `${props.userMail} 환자가 새로운 일기를 작성했습니다: ${diaryContent.slice(0, 20)}...`  // 환자가 접속했으니 의사에게 보낼 메시지 (환자 이메일 포함)
-                : `의사가 새로운 피드백을 남겼습니다`;  // 의사가 접속했으니 환자에게 보낼 피드백 메시지
+                ? `${props.userMail} 환자가 새로운 일기를 작성했습니다: ${Content.slice(0, 20)}...`  // 환자가 접속했으니 의사에게 보낼 메시지 (환자 이메일 포함)
+                : `담당 상담사(의사)가 새로운 피드백을 남겼습니다`;  // 의사가 접속했으니 환자에게 보낼 피드백 메시지
 
             const response = await fetch('https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/fcm/send-notification', {
                 method: 'POST',
@@ -242,7 +240,7 @@ function DiaryList(props) {
             const relatedEmail = await getRelatedEmail(props.userMail, userType);
     
             if (relatedEmail) {
-                await sendDiaryNotificationToBackend(relatedEmail, diary);  // 담당 의사의 이메일과 일기내용 전달
+                await sendDiaryNotificationToBackend(relatedEmail, feedbackText);  // 담당 의사의 이메일과 일기내용 전달
             } else {
                 console.error("정보를 가져올 수 없습니다.");
             }
