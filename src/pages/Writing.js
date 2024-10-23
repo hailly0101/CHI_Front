@@ -269,17 +269,13 @@ function Writing(props) {
             // 오늘 날짜로 컬렉션 이름 생성
             const todayDate = getTodayDate();
 
-            // Firestore에 문서 생성 (컬렉션: diagnosis/{userMail}/)
-            const diagnosisDocRef = doc(db, 'diagnosis', userMail, todayDate);
-
-        // Firestore에 진단 결과를 저장
-            await setDoc(diagnosisDocRef, {
+            await setDoc(doc(db, "diagnosis", props.userMail, todayDate), {
                 counselorDiagnosis: counselorDiagnosis || '진단 결과 없음',
                 doctorDiagnosis: doctorDiagnosis || '진단 결과 없음',
                 pocketMindDiagnosis: pocketMindDiagnosis || '진단 결과 없음',
                 date: todayDate, // 저장 날짜 추가
-                userMail: userMail // 사용자 이메일 추가
-            });
+                userMail: props.userMail // 사용자 이메일 추가
+            }, {merge: true})
 
             console.log("Firestore에 진단 결과 저장 완료:", userMail, todayDate);
         } catch (error) {
