@@ -742,6 +742,7 @@ function Writing(props) {
                 },
                 body: JSON.stringify({
                     diary: diary,
+                    userMail : props.userMail
                 }),
             });
             const data = await response.json();
@@ -925,7 +926,7 @@ function Writing(props) {
     }
 
     function sendEmail() {
-        const to = 'taewan@kaist.ac.kr';
+        const to = 'dlwlsrnjs8316@gmail.com';
     const subject = '[마음챙김]' + props.userMail + '새로운 일기 작성 ';
     const body = '새로운 일기가 작성됨. 사용자id: ' + props.userMail;
 
