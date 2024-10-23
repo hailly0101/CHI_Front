@@ -254,7 +254,41 @@ function Writing(props) {
         }
     
     }, [userType]);  // userType이 변경될 때마다 실행
+
+        // 오늘 날짜를 "YYYY-MM-DD" 형식으로 반환하는 함수
+    function getTodayDate() {
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 1을 더해줌
+        const day = String(currentDate.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`; // "YYYY-MM-DD" 형식으로 날짜 반환
+    }
+    // 병렬로 진단 결과를 저장하는 함수
+    async function saveDiagnosisToFirestore(counselorDiagnosis, doctorDiagnosis, pocketMindDiagnosis, userMail) {
+        try {
+            // 오늘 날짜로 컬렉션 이름 생성
+            const todayDate = getTodayDate();
+
+            // Firestore에 문서 생성 (컬렉션: diagnosis/{userMail}/{todayDate})
+            const diagnosisDocRef = doc(db, 'diagnosis', userMail, todayDate, userMail);
+
+        // Firestore에 진단 결과를 저장
+            await setDoc(diagnosisDocRef, {
+                counselorDiagnosis: counselorDiagnosis || '진단 결과 없음',
+                doctorDiagnosis: doctorDiagnosis || '진단 결과 없음',
+                pocketMindDiagnosis: pocketMindDiagnosis || '진단 결과 없음',
+                date: todayDate, // 저장 날짜 추가
+                userMail: userMail // 사용자 이메일 추가
+            });
+
+            console.log("Firestore에 진단 결과 저장 완료:", userMail, todayDate);
+        } catch (error) {
+            console.error("Firestore에 진단 결과 저장 중 오류 발생:", error);
+        }
+    }
     
+
+
     // FCM 토큰을 생성하고, 백엔드에 전송하는 함수
     async function handleFCMToken(userEmail, userType) {
         try {
@@ -1091,6 +1125,7 @@ function Writing(props) {
                                 onClick={() => {
                                     endSession();
                                     handleShowDiagnosisModal();  // 모달 열기
+                                    saveDiagnosisToFirestore(counselorDiagnosis, doctorDiagnosis, pocketMindDiagnosis, userMail);                             
                                 }}
                             >👍 오늘의 일기쓰기 완료!
                     </Button>
