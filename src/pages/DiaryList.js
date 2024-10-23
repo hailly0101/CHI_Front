@@ -295,13 +295,19 @@ function DiaryList(props) {
                                                         {diary.sessionEnd ? Unix_timestamp2(diary["sessionEnd"]) : "작성 시간 없음"}
                                                     </div>
                                                     {userType === "doctor" && (
-                                                        <div className="nav_title_blue">환자 이메일: {diary.patientEmail}</div>
+                                                        <div className="nav_title_blue">환자 이메일: {diary.patientEmail}
+                                                        <Button
+                                                        variant="secondary"
+                                                        onClick={() => handlePromptEdit(diary.patientEmail)}
+                                                        >
+                                                        프롬프트 확인/수정
+                                                        </Button>
+                                                        </div>
                                                     )}
                                                 </Card.Subtitle>
                                                 <Card.Text>{diary["diary"]}</Card.Text>
                                                 <span className="likebutton" onClick={() => addLike(idx)}>️❤️</span> <b>{diary["like"]}</b>
                                                 <span className="likebutton" onClick={() => addMuscle(idx)}>&nbsp;&nbsp;&nbsp;💪️ </span><b>{diary["muscle"]}</b>
-
                                                 {userType === "doctor" ? (
                                                     <>
                                                         {editingFeedback[idx] ? (
@@ -319,13 +325,7 @@ function DiaryList(props) {
                                                                 >
                                                                     피드백 저장
                                                                 </Button>
-                                                                <Button
-                                                                    variant="secondary"
-                                                                    className="mt-2"  // 약간의 마진을 추가해서 버튼이 분리되어 보이게 함
-                                                                    onClick={() => handlePromptEdit(diary.patientEmail)}
-                                                                >
-                                                                    프롬프트 수정
-                                                                </Button>
+                                                                
                                                             </Form.Group>
                                                         ) : (
                                                             <div>
@@ -365,7 +365,14 @@ function DiaryList(props) {
                                                         {diary.sessionEnd ? Unix_timestamp2(diary["sessionEnd"]) : "작성 시간 없음"}
                                                     </div>
                                                     {userType === "doctor" && (
-                                                        <div className="nav_title_blue">환자 이메일: {diary.patientEmail}</div>
+                                                        <div className="nav_title_blue">환자 이메일: {diary.patientEmail}
+                                                        <Button
+                                                        variant="secondary"
+                                                        onClick={() => handlePromptEdit(diary.patientEmail)}
+                                                        >
+                                                        프롬프트 확인/수정
+                                                        </Button>
+                                                        </div>
                                                     )}
                                                 </Card.Subtitle>
                                                 <Card.Text>{diary["diary"]}</Card.Text>
@@ -389,13 +396,7 @@ function DiaryList(props) {
                                                                 >
                                                                     피드백 저장
                                                                 </Button>
-                                                                <Button
-                                                                    variant="secondary"
-                                                                    className="mt-2"  // 약간의 마진을 추가해서 버튼이 분리되어 보이게 함
-                                                                    onClick={() => handlePromptEdit(diary.patientEmail)}
-                                                                >
-                                                                    프롬프트 수정
-                                                                </Button>
+
                                                             </Form.Group>
                                                         ) : (
                                                             <div>
