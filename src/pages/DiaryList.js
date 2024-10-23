@@ -96,6 +96,91 @@ function DiaryList(props) {
         alert("프롬프트가 성공적으로 저장되었습니다.");
     };
 
+    async function getRelatedEmail(userMail, userType) {
+        console.log("Fetching related email for:", userMail, userType);
+
+        try {
+            if (userType === "patient") {
+                // 'patient' 컬렉션에서 환자의 이메일을 사용하여 문서를 가져옴
+                const patientDocRef = doc(db, 'patient', props.userMail);
+                const patientDoc = await getDoc(patientDocRef);
+        
+                if (patientDoc.exists()) {
+                    // 문서가 존재할 경우 담당 의사 정보 가져오기
+                    const doctorEmail = patientDoc.data().doctor;
+                        console.log(doctorEmail[0]);
+                        return doctorEmail[0];  // 배열이면 첫 번째 이메일만 사용
+                } else {
+                    console.error("해당 환자 담당, 의사 문서가 존재하지 않습니다.");
+                    return null;
+                }
+            } else if (userType === "doctor") {
+                // 'doctor' 컬렉션에서 의사의 이메일을 사용하여 문서를 가져옴
+                const doctorDocRef = doc(db, 'doctor', props.userMail);
+                const doctorDoc = await getDoc(doctorDocRef);
+        
+                if (doctorDoc.exists()) {
+                    // 문서가 존재할 경우 담당 환자 목록 가져오기
+                    const patientEmail = doctorDoc.data().patient;
+                        console.log(patientEmail[0]);
+                        return patientEmail[0];  // 환자 이메일 반환
+                } else {
+                    console.error("해당 의사 관련, 환자의 문서가 존재하지 않습니다.");
+                    return null;
+                }
+            } else {
+                console.log(userType);
+                console.error("올바른 userType을 전달해주세요. 'patient' 또는 'doctor'만 가능합니다.");
+                return null;
+            }
+        } catch (error) {
+            console.error("의사 또는 환자 정보를 가져오는 중 오류 발생:", error);
+            return null;
+        }
+    }
+    
+    
+
+    async function sendDiaryNotificationToBackend(email, diaryContent) {
+        try {
+            console.log("Starting to send notification to backend...");
+            console.log("email:", email);
+            console.log("Diary content (first 20 characters):", diaryContent.slice(0, 20));
+            console.log(userType)
+            const notificationTitle = userType === "patient"
+                ? `${props.userMail} 환자 일기 알림`  // 환자가 접속한 경우 담당 의사에게 보낼 제목 (환자 이메일 포함)
+                : '새로운 피드백 알림';  // 의사가 접속한 경우 환자에게 보낼 제목
+        
+            const notificationBody = userType === "patient"
+                ? `${props.userMail} 환자가 새로운 일기를 작성했습니다: ${diaryContent.slice(0, 20)}...`  // 환자가 접속했으니 의사에게 보낼 메시지 (환자 이메일 포함)
+                : `의사가 새로운 피드백을 남겼습니다`;  // 의사가 접속했으니 환자에게 보낼 피드백 메시지
+
+            const response = await fetch('https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/fcm/send-notification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    title: notificationTitle,
+                    body: notificationBody,
+                    userType : userType
+                }),
+            });
+            console.log("Fetch request sent. Waiting for response...");
+
+            if (!response.ok) {
+                const errorData = await response.text();
+                console.error('Error sending notification:', errorData);
+            } else {
+                const result = await response.json();
+                console.log('Notification sent successfully:', result);
+            }
+        } catch (error) {
+            console.error('Error sending notification to backend:', error);
+        }
+    }
+
     function Unix_timestamp(t) {
         const date = new Date(t * 1000);
         const year = date.getFullYear();
@@ -153,6 +238,14 @@ function DiaryList(props) {
                 feedback: feedbackText
             });
             console.log("피드백 저장 완료:", feedbackText);
+            // Firestore에서 담당 의사, 관련 환자 정보를 가져옴
+            const relatedEmail = await getRelatedEmail(props.userMail, userType);
+    
+            if (relatedEmail) {
+                await sendDiaryNotificationToBackend(relatedEmail, diary);  // 담당 의사의 이메일과 일기내용 전달
+            } else {
+                console.error("정보를 가져올 수 없습니다.");
+            }
 
             // 피드백이 저장되면 상태를 업데이트하여 화면만 새로고침
             setDiaryList((prevState) => {

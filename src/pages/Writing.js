@@ -533,7 +533,7 @@ function Writing(props) {
         if (relatedEmail) {
             await sendDiaryNotificationToBackend(relatedEmail, diary);  // 담당 의사의 이메일과 일기내용 전달
         } else {
-            console.error("담당 의사 정보를 가져올 수 없습니다.");
+            console.error("정보를 가져올 수 없습니다.");
         }
 
         // 진단 요청들을 병렬로 실행
