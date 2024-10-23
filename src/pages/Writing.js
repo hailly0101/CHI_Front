@@ -269,8 +269,8 @@ function Writing(props) {
             // 오늘 날짜로 컬렉션 이름 생성
             const todayDate = getTodayDate();
 
-            // Firestore에 문서 생성 (컬렉션: diagnosis/{userMail}/{todayDate})
-            const diagnosisDocRef = doc(db, 'diagnosis', userMail, todayDate, userMail);
+            // Firestore에 문서 생성 (컬렉션: diagnosis/{userMail}/)
+            const diagnosisDocRef = doc(db, 'diagnosis', userMail, todayDate);
 
         // Firestore에 진단 결과를 저장
             await setDoc(diagnosisDocRef, {
@@ -576,6 +576,7 @@ function Writing(props) {
             requestDoctorDiagnosis(diary),
             requestPocketMindDiagnosis(diary)
         ]);
+        await saveDiagnosisToFirestore(counselorDiagnosis, doctorDiagnosis, pocketMindDiagnosis, userMail);
 
         // // 진단 결과를 Firebase에 업데이트
         // await setDoc(doc(db, "session", props.userMail, "diary", session), {
@@ -1124,8 +1125,7 @@ function Writing(props) {
                                 style={{backgroundColor: "007AFF", fontWeight: "600"}}
                                 onClick={() => {
                                     endSession();
-                                    handleShowDiagnosisModal();  // 모달 열기
-                                    saveDiagnosisToFirestore(counselorDiagnosis, doctorDiagnosis, pocketMindDiagnosis, userMail);                             
+                                    handleShowDiagnosisModal();  // 모달 열기                            
                                 }}
                             >👍 오늘의 일기쓰기 완료!
                     </Button>
