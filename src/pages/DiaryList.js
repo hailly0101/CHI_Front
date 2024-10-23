@@ -6,6 +6,7 @@ import React from 'react';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 import {
     collection,
     query,
@@ -17,6 +18,7 @@ import {
     getDoc,
     setDoc
 } from "firebase/firestore";
+
 import { db } from "../firebase-config";
 
 function DiaryList(props) {
@@ -28,6 +30,12 @@ function DiaryList(props) {
     const [feedback, setFeedback] = useState({});  // 피드백 상태 저장
     const [editingFeedback, setEditingFeedback] = useState({}); // 피드백 수정 상태 저장
     const [unfinishedFeedbackCount, setUnfinishedFeedbackCount] = useState(0); // 피드백 미완료 개수
+
+        // 모달 상태 관리
+    const [showModal, setShowModal] = useState(false);
+    const [currentPrompt, setCurrentPrompt] = useState("");  // 프롬프트 상태 관리
+    const [selectedPatientEmail, setSelectedPatientEmail] = useState(null); // 선택한 환자의 이메일
+    const [selectedSessionNumber, setSelectedSessionNumber] = useState(null); // 선택한 세션 번호
 
     // 사용자 유형을 Firestore에서 확인하여 의사 또는 환자 구분
     useEffect(() => {
@@ -65,6 +73,28 @@ function DiaryList(props) {
             }
         }
     }, [userType]);  // userType이 변경될 때마다 실행
+
+    const handlePromptEdit = async (patientEmail) => {
+        setSelectedPatientEmail(patientEmail);
+
+        // Firestore에서 해당 환자의 프롬프트를 불러옴
+        const promptDocRef = doc(db, "prompt", patientEmail);
+        const promptDoc = await getDoc(promptDocRef);
+        if (promptDoc.exists()) {
+            setCurrentPrompt(promptDoc.data().prompt || "");  // 기존 프롬프트 불러오기
+        } else {
+            setCurrentPrompt("");  // 기존 프롬프트가 없을 경우 빈 값
+        }
+        setShowModal(true); // 모달창 표시
+    };
+
+    // 프롬프트 수정 후 저장하는 함수
+    const savePrompt = async () => {
+        const promptDocRef = doc(db, "prompt", selectedPatientEmail);
+        await setDoc(promptDocRef, { prompt: currentPrompt });
+        setShowModal(false); // 모달창 닫기
+        alert("프롬프트가 성공적으로 저장되었습니다.");
+    };
 
     function Unix_timestamp(t) {
         const date = new Date(t * 1000);
@@ -241,13 +271,15 @@ function DiaryList(props) {
                     <Row>
                         <Col>
                             <div className="diarylist_box">
-                                <div className="desktop-view">환자 일기 피드백</div>
-                                <div className="smartphone-view-text">환자 일기 피드백</div>
-                                <div>피드백 미완료: {unfinishedFeedbackCount}</div>
+                                <div className="desktop-view">일기 피드백</div>
+                                <div className="smartphone-view-text">일기 피드백</div>
+                                <div className="desktop-view">피드백 미완료: {unfinishedFeedbackCount}</div>
+                                <div className="desktop-view">피드백 미완료: {unfinishedFeedbackCount}</div>
                             </div>
                         </Col>
                     </Row>
                     <Row>
+                    <div className="desktop-view">
                         <div className="writing_box">
                             <Row xs={'auto'} md={1} className="g-4">
                                 {diaryList.map((diary, idx) => (
@@ -287,6 +319,13 @@ function DiaryList(props) {
                                                                 >
                                                                     피드백 저장
                                                                 </Button>
+                                                                <Button
+                                                                    variant="secondary"
+                                                                    className="mt-2"  // 약간의 마진을 추가해서 버튼이 분리되어 보이게 함
+                                                                    onClick={() => handlePromptEdit(diary.patientEmail)}
+                                                                >
+                                                                    프롬프트 수정
+                                                                </Button>
                                                             </Form.Group>
                                                         ) : (
                                                             <div>
@@ -309,9 +348,132 @@ function DiaryList(props) {
                                 <div className="footer"></div>
                             </Row>
                         </div>
+                    </div>
+                    <div className="smartphone-view-text">
+                        <div className="writing_box">
+                            <Row xs={'auto'} md={1} className="g-4">
+                                {diaryList.map((diary, idx) => (
+                                    <Col key={idx}>
+                                        <Card style={{ width: '100%' }}>
+                                            <Card.Body>
+                                                <Card.Title>{diary.sessionEnd ? Unix_timestamp(diary["sessionEnd"]) : "작성일 없음"}</Card.Title>
+                                                <Card.Subtitle className="mb-2 text-muted">
+                                                    <div className="nav_title_blue desktop-view">
+                                                        {diary.sessionEnd ? Unix_timestamp2(diary["sessionEnd"]) : "작성 시간 없음"}
+                                                    </div>
+                                                    <div className="nav_title_blue smartphone-view-text">
+                                                        {diary.sessionEnd ? Unix_timestamp2(diary["sessionEnd"]) : "작성 시간 없음"}
+                                                    </div>
+                                                    {userType === "doctor" && (
+                                                        <div className="nav_title_blue">환자 이메일: {diary.patientEmail}</div>
+                                                    )}
+                                                </Card.Subtitle>
+                                                <Card.Text>{diary["diary"]}</Card.Text>
+                                                <span className="likebutton" onClick={() => addLike(idx)}>️❤️</span> <b>{diary["like"]}</b>
+                                                <span className="likebutton" onClick={() => addMuscle(idx)}>&nbsp;&nbsp;&nbsp;💪️ </span><b>{diary["muscle"]}</b>
+
+                                                {userType === "doctor" ? (
+                                                    <>
+                                                        {editingFeedback[idx] ? (
+                                                            <Form.Group controlId={`feedbackForm-${idx}`}>
+                                                                <Form.Label>피드백 입력:</Form.Label>
+                                                                <Form.Control
+                                                                    as="textarea"
+                                                                    rows={3}
+                                                                    value={feedback[idx] || ""}
+                                                                    onChange={(e) => handleFeedbackChange(idx, e.target.value)}
+                                                                />
+                                                                <Button
+                                                                    variant="primary"
+                                                                    onClick={() => handleFeedbackSubmit(idx, diary.patientEmail, diary.sessionNumber)}
+                                                                >
+                                                                    피드백 저장
+                                                                </Button>
+                                                                <Button
+                                                                    variant="secondary"
+                                                                    className="mt-2"  // 약간의 마진을 추가해서 버튼이 분리되어 보이게 함
+                                                                    onClick={() => handlePromptEdit(diary.patientEmail)}
+                                                                >
+                                                                    프롬프트 수정
+                                                                </Button>
+                                                            </Form.Group>
+                                                        ) : (
+                                                            <div>
+                                                                <strong>저장된 피드백:</strong> {diary.feedback || "피드백을 입력하세요"}
+                                                                <Button variant="link" onClick={() => toggleFeedbackEdit(idx)}>
+                                                                    {diary.feedback ? "수정하기" : "입력하기"}
+                                                                </Button>
+                                                            </div>
+                                                        )}
+                                                    </>
+                                                ) : (
+                                                    <div>
+                                                        <strong>저장된 피드백:</strong> {diary.feedback || "아직 피드백이 없습니다."}
+                                                    </div>
+                                                )}
+                                            </Card.Body>
+                                        </Card>
+                                    </Col>
+                                ))}
+                                <div className="footer"></div>
+                            </Row>
+                        </div>
+                    </div>
                     </Row>
                 </Container>
+                <div className="desktop-view">
+                <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>프롬프트 수정</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form.Group controlId="promptTextarea">
+                        <Form.Label>현재 프롬프트:</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            rows={3}
+                            value={currentPrompt}
+                            onChange={(e) => setCurrentPrompt(e.target.value)}
+                        />
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                        취소
+                    </Button>
+                    <Button variant="primary" onClick={savePrompt}>
+                        저장
+                    </Button>
+                </Modal.Footer>
+            </Modal>
             </div>
+            <div className="smartphone-view-text">
+                <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>프롬프트 수정</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form.Group controlId="promptTextarea">
+                        <Form.Label>현재 프롬프트:</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            rows={3}
+                            value={currentPrompt}
+                            onChange={(e) => setCurrentPrompt(e.target.value)}
+                        />
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                        취소
+                    </Button>
+                    <Button variant="primary" onClick={savePrompt}>
+                        저장
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+            </div>
+        </div>
         );
     }
 }

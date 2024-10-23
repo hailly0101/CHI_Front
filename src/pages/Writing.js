@@ -69,6 +69,8 @@ function Writing(props) {
     const current = new Date();
     const date = `${current.getFullYear()}년 ${current.getMonth() + 1}월 ${current.getDate()}일`;
 
+    
+
     const phq1 = useRef(null)
     const phq2 = useRef(null)
     const phq3 = useRef(null)
