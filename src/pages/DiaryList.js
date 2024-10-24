@@ -22,7 +22,7 @@ import {
 import { db } from "../firebase-config";
 
 
-
+/* eslint-disable no-inner-declarations */
 
 function DiaryList(props) {
     const [diaryList, setDiaryList] = useState([]);

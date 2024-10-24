@@ -23,7 +23,6 @@ import DiaryList from "./pages/DiaryList";
 import Home from "./pages/Home";
 import {doc, getDoc} from "firebase/firestore";
 import { getToken } from 'firebase/messaging';
-import TopNav from './component/common/TopNav';
 
 const cookies = new Cookies();
 
@@ -114,7 +113,71 @@ function App() {
 
             <div className="App">
             <div>
-               <TopNav/>
+                <div>
+                    <Navbar collapseOnSelect expand="sm" bg="light" variant="light" expanded={expanded}>
+                        <Container>
+                            <Navbar.Brand
+                                onClick={() => {
+                                    navigate('/');
+                                    setExpanded(false);
+                                }}
+                            >
+                                <Stack gap={0}>
+                                    <div className="nav_title_black">Pocket</div>
+                                    <div className="nav_title_blue">Mind-Bot</div>
+                                </Stack>
+                            </Navbar.Brand>
+                            {/* <Navbar.Toggle aria-controls="responsive-navbar-nav"
+                                           onClick={() => setExpanded(!expanded)}/> */}
+                            {/* <Navbar.Collapse id="responsive-navbar-nav">
+                                <Nav className="me-auto">
+                                    <Nav.Link
+                                        onClick={() => {
+                                            navigate('/');
+                                            setExpanded(false);
+                                        }}
+                                    >
+                                        <div className="nav_title_black">홈</div>
+                                    </Nav.Link>
+                                    <Nav.Link
+                                        onClick={() => {
+                                            navigate('/writing');
+                                            setExpanded(false);
+                                        }}
+                                    >
+                                        <div className="nav_title_black">작성하기</div>
+                                    </Nav.Link>
+                                    <Nav.Link
+                                        onClick={() => {
+                                            navigate('/list');
+                                            setExpanded(false);
+                                        }}
+                                    >
+                                        <div className="nav_title_black">돌아보기</div>
+                                    </Nav.Link>
+                                    {isAuth ? (
+                                        <Nav.Link
+                                            onClick={() => {
+                                                signUserOut();
+                                                setExpanded(false);
+                                            }}
+                                        >
+                                            <div className="nav_title_black">로그아웃</div>
+                                        </Nav.Link>
+                                    ) : null}
+                                </Nav>
+                                <Nav>
+                                    <Stack gap={0}>
+                                        <div className="nav_title_blue">
+                                            <b>Pilot Test</b>
+                                        </div>
+                                        <div className="nav_title_black">{date}</div>
+                                    </Stack>
+                                </Nav>
+                            </Navbar.Collapse> */}
+                        </Container>
+                    </Navbar>
+                </div>
                 <Routes>
                     <Route path="/" element={
                         <div>

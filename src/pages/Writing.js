@@ -1221,8 +1221,9 @@ function Writing(props) {
                         &nbsp;
                         <Row xs={'auto'} md={1} className="g-4">
                             {existing.map((_, idx) => (
-                                <Col>
-                                    <Button
+                                <Col   key={idx}>
+                                    <Button 
+                                 
                                         variant="dark"
                                         style={{backgroundColor: "007AFF", fontWeight: "400"}}
                                         onClick={() => {
