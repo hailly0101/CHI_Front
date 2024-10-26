@@ -6,7 +6,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import Stack from 'react-bootstrap/Stack';
 
 import React from 'react';
-import useSize from './component/common/useSize';
+
 import { extendTheme, ChakraProvider, StyleFunctionProps } from "@chakra-ui/react";
 import {useState, useEffect} from "react";
 import {Routes, Route, useNavigate} from 'react-router-dom';
@@ -23,13 +23,10 @@ import DiaryList from "./pages/DiaryList";
 import Home from "./pages/Home";
 import {doc, getDoc} from "firebase/firestore";
 import { getToken } from 'firebase/messaging';
-import TopNav from './component/common/TopNav';
-import BottomNav from './component/common/BottomNav';
 
 const cookies = new Cookies();
 
 function App() {
-    const { height } = useSize();
     useEffect(() => {
         async function requestPermission() {
             console.log("권한 요청 중...");
@@ -90,7 +87,6 @@ function App() {
           html: {
             maxW: '500px',
             mx: 'auto',
-            height: height,
             bg: 'gray.100',
             webkitTouchCallout: 'none',
             webkitUserSelect: 'none',
@@ -117,21 +113,85 @@ function App() {
 
             <div className="App">
             <div>
-               <TopNav/>
+                <div>
+                    <Navbar collapseOnSelect expand="sm" bg="light" variant="light" expanded={expanded}>
+                        <Container>
+                            <Navbar.Brand
+                                onClick={() => {
+                                    navigate('/');
+                                    setExpanded(false);
+                                }}
+                            >
+                                <Stack gap={0}>
+                                    <div className="nav_title_black">Pocket</div>
+                                    <div className="nav_title_blue">Mind-Bot</div>
+                                </Stack>
+                            </Navbar.Brand>
+                            {/* <Navbar.Toggle aria-controls="responsive-navbar-nav"
+                                           onClick={() => setExpanded(!expanded)}/> */}
+                            {/* <Navbar.Collapse id="responsive-navbar-nav">
+                                <Nav className="me-auto">
+                                    <Nav.Link
+                                        onClick={() => {
+                                            navigate('/');
+                                            setExpanded(false);
+                                        }}
+                                    >
+                                        <div className="nav_title_black">홈</div>
+                                    </Nav.Link>
+                                    <Nav.Link
+                                        onClick={() => {
+                                            navigate('/writing');
+                                            setExpanded(false);
+                                        }}
+                                    >
+                                        <div className="nav_title_black">작성하기</div>
+                                    </Nav.Link>
+                                    <Nav.Link
+                                        onClick={() => {
+                                            navigate('/list');
+                                            setExpanded(false);
+                                        }}
+                                    >
+                                        <div className="nav_title_black">돌아보기</div>
+                                    </Nav.Link>
+                                    {isAuth ? (
+                                        <Nav.Link
+                                            onClick={() => {
+                                                signUserOut();
+                                                setExpanded(false);
+                                            }}
+                                        >
+                                            <div className="nav_title_black">로그아웃</div>
+                                        </Nav.Link>
+                                    ) : null}
+                                </Nav>
+                                <Nav>
+                                    <Stack gap={0}>
+                                        <div className="nav_title_blue">
+                                            <b>Pilot Test</b>
+                                        </div>
+                                        <div className="nav_title_black">{date}</div>
+                                    </Stack>
+                                </Nav>
+                            </Navbar.Collapse> */}
+                        </Container>
+                    </Navbar>
+                </div>
                 <Routes>
                     <Route path="/" element={
                         <div>
                             {/* 로그인 한 상태이면 HOME 으로 그렇지 않으면 Auth 로그인 페이지로 이동 */}
-                            {isAuth ? ( <><Home userName={userName} userMail={userMail} diaryCount={diaryCount}/><BottomNav number={1} /></>) : (
+                            {isAuth ? (<Home userName={userName} userMail={userMail} diaryCount={diaryCount}/>) : (
                                 <Auth setIsAuth={setIsAuth} setUserName={setUserName}/>)}
                         </div>
                     }/>
                     <Route path="/writing"
-                           element={isAuth ? (<div><Writing userName={userName} userMail={userMail}/><BottomNav number={2}/></div>) : (
+                           element={isAuth ? (<div><Writing userName={userName} userMail={userMail}/></div>) : (
                                <Auth setIsAuth={setIsAuth} setUserName={setUserName} setUserMail={setUserMail}/>)
                            }/>
                     <Route path="/list"
-                           element={isAuth ? (<div><DiaryList userName={userName} userMail={userMail} number={3} /><BottomNav number={3} signUserOut={signUserOut}/></div>) : (
+                           element={isAuth ? (<div><DiaryList userName={userName} userMail={userMail}/></div>) : (
                                <Auth setIsAuth={setIsAuth} setUserName={setUserName} setUserMail={setUserMail}/>)}/>
                     <Route path="/loading" element={<div><Loading/></div>}/>
                     <Route path="*" element={<div>404~ 없는페이지임</div>}/>
