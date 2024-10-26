@@ -1,6 +1,6 @@
-export const ColorBlack = '#000000';
-export const ColorTextBlack = '#1A1A1A';
-export const ColorTextGray = '#757983';
+export const ColorSigniture = '#FFB284';
+export const ColorButtomGray = '#C6C09C';
+export const ColorButtomPink = '#E79796';
 export const ColorBackGray = '#F7F8F8';
 export const ColorLineGray = '#F2F3F5';
 export const ColorInputBack = '#F3F3F3';

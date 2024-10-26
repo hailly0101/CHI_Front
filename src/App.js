@@ -6,7 +6,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import Stack from 'react-bootstrap/Stack';
 
 import React from 'react';
-
+import useSize from './component/common/useSize';
 import { extendTheme, ChakraProvider, StyleFunctionProps } from "@chakra-ui/react";
 import {useState, useEffect} from "react";
 import {Routes, Route, useNavigate} from 'react-router-dom';
@@ -24,10 +24,12 @@ import Home from "./pages/Home";
 import {doc, getDoc} from "firebase/firestore";
 import { getToken } from 'firebase/messaging';
 import TopNav from './component/common/TopNav';
+import BottomNav from './component/common/BottomNav';
 
 const cookies = new Cookies();
 
 function App() {
+    const { height } = useSize();
     useEffect(() => {
         async function requestPermission() {
             console.log("권한 요청 중...");
@@ -88,6 +90,7 @@ function App() {
           html: {
             maxW: '500px',
             mx: 'auto',
+            height: height,
             bg: 'gray.100',
             webkitTouchCallout: 'none',
             webkitUserSelect: 'none',
@@ -119,16 +122,16 @@ function App() {
                     <Route path="/" element={
                         <div>
                             {/* 로그인 한 상태이면 HOME 으로 그렇지 않으면 Auth 로그인 페이지로 이동 */}
-                            {isAuth ? (<Home userName={userName} userMail={userMail} diaryCount={diaryCount}/>) : (
+                            {isAuth ? ( <><Home userName={userName} userMail={userMail} diaryCount={diaryCount}/><BottomNav number={1} /></>) : (
                                 <Auth setIsAuth={setIsAuth} setUserName={setUserName}/>)}
                         </div>
                     }/>
                     <Route path="/writing"
-                           element={isAuth ? (<div><Writing userName={userName} userMail={userMail}/></div>) : (
+                           element={isAuth ? (<div><Writing userName={userName} userMail={userMail}/><BottomNav number={2}/></div>) : (
                                <Auth setIsAuth={setIsAuth} setUserName={setUserName} setUserMail={setUserMail}/>)
                            }/>
                     <Route path="/list"
-                           element={isAuth ? (<div><DiaryList userName={userName} userMail={userMail}/></div>) : (
+                           element={isAuth ? (<div><DiaryList userName={userName} userMail={userMail} number={3} /><BottomNav number={3} signUserOut={signUserOut}/></div>) : (
                                <Auth setIsAuth={setIsAuth} setUserName={setUserName} setUserMail={setUserMail}/>)}/>
                     <Route path="/loading" element={<div><Loading/></div>}/>
                     <Route path="*" element={<div>404~ 없는페이지임</div>}/>

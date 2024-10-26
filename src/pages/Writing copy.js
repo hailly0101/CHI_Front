@@ -12,10 +12,9 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
-
+import Button from 'react-bootstrap/Button';
 import Card from "react-bootstrap/Card";
-
-import { Flex, Text, Button } from "@chakra-ui/react";
+import Badge from 'react-bootstrap/Badge';
 import Toast from 'react-bootstrap/Toast';
 import {BeatLoader, HashLoader} from "react-spinners";
 import "react-datepicker/dist/react-datepicker.css";
@@ -29,10 +28,7 @@ import book_purple from "../img/book_purple.jpg";
 import chat from "../img/chat.jpg";
 import lock from "../img/lock.jpg";
 import { getAuth, onAuthStateChanged } from "firebase/auth"; // Firebase Authentication 추가
-import Userinput from "../component/Write/UserInput";
 import ChatBox from "../component/Write/ChatBox";
-import DiaryView from "../component/Write/DiaryView";
-import { ColorSigniture } from "../utils/_Palette";
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker
         .register("/firebase-messaging-sw.js").then((registration) => {
@@ -232,7 +228,7 @@ function Writing(props) {
         }
     }, [userType]);
 
-
+    
     useEffect(() => {
         // userType이 설정된 후에 FCM 토큰 처리
         console.log("userType 상태 확인:", userType);  // userType 상태 확인용 로그 추가
@@ -661,7 +657,7 @@ function Writing(props) {
     async function getLastSentence(response) {
         let a = setTimeout(() => {
             setModule(response["module"])
-            setPrompt(response["options"]?.[0])
+            setPrompt(response["options"][0])
             if (prompt) {
                 if ((prompt).trim() === "") {
                     setLoading(true)
@@ -1037,9 +1033,7 @@ function Writing(props) {
                 <Container>
                     <Row>
                         <div className="loading_box">
-                        <span className="desktop-view">
-                            {date}<br/><b>오늘 나의 마음상태를 확인해봐요</b> 😀
-                        </span>
+                 
                             <span className="smartphone-view">
                             {date}<br/><b>오늘 마음상태를<br/>확인해봐요</b> 😀
                         </span>
@@ -1169,26 +1163,44 @@ function Writing(props) {
         }
 
 
-        
     } else if (sessionStatus === false) {
 
         return (
 
             <div>
                 {isEvening ? (
-                    <Flex flexDir={'column'}>
-                        <Text>{date}<br/><b>마음챙김 다이어리를<br/>시작합니다</b> 😀</Text>
-                        <Button   
-                            backgroundColor={ColorSigniture}
-                            color={'white'}
-                            onClick={() => {
-                                const newSession = String(Math.floor(Date.now() / 1000));
-                                setSession(newSession)
-                                createNewDoc(newSession)
-                                sendEmail()
-                            }}>📝 일기 작성하기</Button>
-                            <Text> 종료되지 않은 세션을 이어 진행하려면<br/>아래에서 진행중인 세션을 선택해주세요</Text>
-                            <Row xs={'auto'} md={1} className="g-4">
+                    <Container>
+                        <Row>
+                            <div className="loading_box">
+                                <span className="smartphone-view">
+                            {date}<br/><b>마음챙김 다이어리를<br/>시작합니다</b> 😀
+                        </span>
+                            </div>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <div className="d-grid gap-2">
+                                    <Button
+                                        variant="primary"
+                                        style={{backgroundColor: "007AFF", fontWeight: "600"}}
+                                        onClick={() => {
+                                            const newSession = String(Math.floor(Date.now() / 1000));
+                                            setSession(newSession)
+                                            createNewDoc(newSession)
+                                            sendEmail()
+                                        }}
+                                    >📝 일기 작성하기
+                                    </Button>
+                                    &nbsp;
+                                    <Form.Text className="text-muted">
+                                        종료되지 않은 세션을 이어 진행하려면<br/>아래에서 진행중인 세션을 선택해주세요
+                                    </Form.Text>
+                                </div>
+                            </Col>
+                            <Col></Col>
+                        </Row>
+                        &nbsp;
+                        <Row xs={'auto'} md={1} className="g-4">
                             {existing.map((_, idx) => (
                                 <Col   key={idx}>
                                     <Button 
@@ -1207,7 +1219,7 @@ function Writing(props) {
 
 
                         </Row>
-                    </Flex>
+                    </Container>
                 ) : (
                     <Container>
                         <Row>
@@ -1351,7 +1363,236 @@ function Writing(props) {
     }
 }
 
+//User input screen component
+function Userinput(props) {
+    const temp_comment_input = useRef("");
+    return (
+        <div>
+            <Row>
+                <ToastContainer className="p-3" position={"top-center"}>
+                    <Toast onClose={() => props.setShow(false)} show={props.show} delay={3000} autohide>
+                        <Toast.Header>
+                            <strong className="me-auto">알림</strong>
+                            <small>이창은 3초 후 자동으로 닫힘니다</small>
+                        </Toast.Header>
+                        <Toast.Body>새로운 다이어리가 작성되었어요.</Toast.Body>
+                    </Toast>
+                </ToastContainer>
+                <Col>
+                    <div className="prompt_box">
+                            <span className="desktop-view">
+                                <div className="tte">
+                                {props.prompt}
+                            </div>
+                            </span>
+                        <span className="smartphone-view-text-large">
+                                <div className="tte">
+                                {props.prompt}
+                            </div>
+                            </span>
+                    </div>
+                </Col>
+            </Row>
+            <Row>
+                <div className="writing_box">
+                    <Form.Label htmlFor="userInput">
+                       <span className="desktop-view">
+                            ✏️ 나의 일기 입력하기
+                        </span>
+                        <span className="smartphone-view-text-tiny">
+                            ✏️ 나의 일기 입력하기
+                        </span>
+                    </Form.Label>
+                    <Form.Control
+                        type="text"
+                        as="textarea"
+                        rows={3}
+                        id="userInput"
+                        value={props.textInput}
+                        onChange={(e) => props.setTextInput(e.target.value)}
+                    />
+                    <Form.Text id="userInput" muted>
+                        📝 편안하고 자유롭게 최근에 있었던 일을 작성해주세요.
+                    </Form.Text>
+                </div>
+                <Row className="desktop-view">
+                    <Col>
+                        <div className="d-grid gap-1">
+                            <Button
+                                variant="dark"
+                                style={{backgroundColor: "007AFF", fontWeight: "600"}}
+                                onClick={props.toggleListening}>
+                                {props.isListening ? '🛑 응답 종료하기' : '🎙️ 목소리로 응답하기'}
+                            </Button>
+                        </div>
+                    </Col>
+                    <Col>
+                        <div className="d-grid gap-1">
+                            <Button
+                                variant="primary"
+                                style={{backgroundColor: "007AFF", fontWeight: "600"}}
+                                onClick={() => {
+                                    (function () {
+                                        if (props.textInput.length < 10) {
+                                            alert("입력한 내용이 너무 짧아요. 조금만 더 입력해볼까요?")
+                                        } else if (props.isListening === true) {
+                                            props.toggleListening()
+                                            props.addConversationFromUser(props.textInput, temp_comment_input.current)
+                                        } else {
+                                            props.addConversationFromUser(props.textInput, temp_comment_input.current)
+                                        }
+                                    })()
+                                }}>💬 응답 전송하기</Button>
+                        </div>
+                    </Col>
+                    <Form.Text id="userInput" muted>
+                        📖 3턴이 넘어가면 다이어리가 자동으로 생성됩니다.
+                    </Form.Text>
+                </Row>
+                <div className="smartphone-view">
+                    <div className="d-grid gap-2">
+                        <Button
+                            variant="dark"
+                            style={{backgroundColor: "007AFF", fontWeight: "600"}}
+                            onClick={props.toggleListening}>
+                            {props.isListening ? '🛑 응답 종료하기' : '🎙️ 목소리로 응답하기'}
+                        </Button>
+                        <Button
+                            variant="primary"
+                            style={{backgroundColor: "007AFF", fontWeight: "600"}}
+                            onClick={() => {
+                                (function () {
+                                    if (props.textInput.length < 10) {
+                                        alert("입력한 내용이 너무 짧아요. 조금만 더 입력해볼까요?")
+                                    } else if (props.isListening === true) {
+                                        props.toggleListening()
+                                        props.addConversationFromUser(props.textInput, temp_comment_input.current)
+                                    } else {
+                                        props.addConversationFromUser(props.textInput, temp_comment_input.current)
+                                    }
+                                })()
+                            }}>💬 응답 전송하기</Button>
+                    </div>
+                    <Form.Text id="userInput" muted>
+                        📖 3턴이 넘어가면 다이어리가 자동으로 생성됩니다.
+                    </Form.Text>
+                </div>
+            </Row>
+        </div>
+    )
+}
 
+function DiaryView(props) {
+    const [editMode, setEditMode] = useState(false);
+    const [diaryedit, setDiaryedit] = useState("");
+
+    if (props.diary === "") {
+        return (
+            <div className="inwriting_review_box">
+                <Row>
+                    <div className="loading_box_2">
+                        <div>
+                            <BeatLoader
+                                color="#007AFF"
+                                speedMultiplier={0.6}
+                            />
+                        </div>
+                        <span className="desktop-view">
+                                <Form.Text id="userInput" muted><div style={{fontSize: '20px'}}>일기 작성중입니다. 다이어리 작성을 더 진행해주세요</div></Form.Text>
+                            </span>
+                        <span className="smartphone-view">
+                                <Form.Text id="userInput" muted><div style={{fontSize: '15px'}}>일기 작성중입니다.<br/>다이어리 작성을 더 진행해주세요</div></Form.Text>
+                            </span>
+                    </div>
+                </Row>
+            </div>
+        )
+    } else if (editMode === false) {
+        return (
+            <div className="inwriting_review_box">
+                &nbsp;
+                <Row xs={'auto'} md={1} className="g-4">
+                    <Col>
+                        <Card style={{
+                            width: '100%',
+                        }}>
+                            <Card.Body>
+                                <Card.Title>
+                                    오늘의 마음챙김 다이어리
+                                </Card.Title>
+
+                                <Card.Text>
+                                    <div>{props.diary}</div>
+                                </Card.Text>
+                                &nbsp;
+                                <Card.Subtitle className="mb-2 text">
+                                    <span className="likebutton"
+                                          onClick={() => {
+                                              setEditMode(true)
+                                              setDiaryedit(props.diary)
+                                          }}
+                                    >✍️수정하기️</span>
+                                </Card.Subtitle>
+                            </Card.Body>
+
+                        </Card>
+
+
+                        <Col>
+                            <div className="submission"></div>
+                            <div className="d-grid gap-2">
+
+                                <Button
+                                    variant="dark"
+                                    style={{backgroundColor: "007AFF", fontWeight: "600"}}
+                                    onClick={() => {
+                                        props.setModalShow(true)
+                                    }}
+                                >📝 일기 저장하고 종료하기</Button>
+                            </div>
+                            <div className="footer"></div>
+                        </Col>
+                    </Col>
+                </Row>
+            </div>
+        )
+    } else if (editMode) {
+        return (
+            <div className="inwriting_review_box">
+                <Form.Label htmlFor="userInput">
+                        <span className="desktop-view">
+                            📝️ 내용을 수정해주세요
+                        </span>
+                    <span className="smartphone-view-text-tiny">
+                            📝️ 내용을 수정해주세요
+                        </span>
+                </Form.Label>
+                <Form.Control
+                    type="text"
+                    as="textarea"
+                    rows={5}
+                    id="userInput"
+                    value={diaryedit}
+                    onChange={(e) => setDiaryedit(e.target.value)}
+                />
+
+                <div className="submission"></div>
+                <div className="d-grid gap-2">
+                    <Button
+                        variant="dark"
+                        style={{backgroundColor: "007AFF", fontWeight: "600"}}
+                        onClick={() => {
+                            props.editDiary(diaryedit)
+                            setEditMode(false)
+                        }}
+                    >📝 일기 수정완료</Button>
+                </div>
+                <div className="footer"></div>
+
+            </div>
+        )
+    }
+}
 
 function Loading() {
     return (
