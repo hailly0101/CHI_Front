@@ -8,7 +8,6 @@ const BottomNav = ({number, signUserOut}) => {
 
 
     function navigateToWriting(pathname) {
-      alert(pathname)
       navigate(pathname);
   }
     return (
@@ -95,7 +94,7 @@ const BottomNav = ({number, signUserOut}) => {
               w="28px"
               h="28px"
               onClick={
-                signUserOut
+                navigateToWriting('/list')
               }
             />
             <Text fontSize={'12px'} fontWeight={500}>
