@@ -1,9 +1,6 @@
 import './App.css';
 
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import Stack from 'react-bootstrap/Stack';
+
 
 import React from 'react';
 import useSize from './component/common/useSize';
@@ -66,6 +63,11 @@ function App() {
     const current = new Date();
     const date = `${current.getFullYear()}년 ${current.getMonth() + 1}월 ${current.getDate()}일`;
 
+
+    useEffect(()=>{
+        setIsAuth(cookies.get("auth-token"))
+    }, [cookies.get("auth-token")])
+    
     async function settingName() {
         const docRef = doc(db, 'prompt', 'module1_1');
         
@@ -131,7 +133,7 @@ function App() {
                                <Auth setIsAuth={setIsAuth} setUserName={setUserName} setUserMail={setUserMail}/>)
                            }/>
                     <Route path="/list"
-                           element={isAuth ? (<div><DiaryList userName={userName} userMail={userMail} number={3} /><BottomNav number={3} signUserOut={signUserOut}/></div>) : (
+                           element={isAuth ? (<div><DiaryList userName={userName} userMail={userMail} number={3} /><BottomNav number={3}/></div>) : (
                                <Auth setIsAuth={setIsAuth} setUserName={setUserName} setUserMail={setUserMail}/>)}/>
                     <Route path="/loading" element={<div><Loading/></div>}/>
                     <Route path="*" element={<div>404~ 없는페이지임</div>}/>

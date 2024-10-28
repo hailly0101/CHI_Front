@@ -1,14 +1,13 @@
 import {auth, provider} from "../firebase-config"
 import {signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile} from 'firebase/auth'
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+
 import Cookies from 'universal-cookie'
-import Button from "react-bootstrap/Button";
-import Form from 'react-bootstrap/Form';
+
+import { Flex, Text, Box, Input, Button } from "@chakra-ui/react";
 
 
 import {React, useState} from "react";
+import { ColorSigniture } from "../utils/_Palette";
 
 const cookies = new Cookies()
 
@@ -81,144 +80,25 @@ export const Auth = (props) => {
     }
 
 
-    if (newUser) {
-        return (
-            <div>
-                <Container>
-                    <Row>
-                        <div className="loading_box">
-                    <span className="desktop-view">
-                마음챙김 다이어리를 이용하기 위해<br/><b>로그인이 필요합니다</b> 🔒
-            </span>
-                            <span className="smartphone-view">
-                다이어리를 이용하시려면<br/><b>로그인이 필요합니다</b> 🔒
-            </span>
-                        </div>
-                    </Row>
 
-                <Row>
-                        <Col>
-                            <Form.Group className="mb-3" controlId="formBasicEmail">
-                                <Form.Control type="email" placeholder="✉️ 이메일 주소를 입력해주세요"
-                                              onChange={(e) => setEmail(e.target.value)}/>
-                            </Form.Group>
-                            <Form.Group className="mb-3" controlId="formBasicUsername">
-                                <Form.Control type="text" placeholder="👤 성함을 입력해주세요"
-                                              onChange={(e) => setUsername(e.target.value)}/>
-                                <Form.Text className="text-muted">
-                                </Form.Text>
-                            </Form.Group>
-                            <Form.Group className="mb-3" controlId="formBasicPassword">
-                                {/*<Form.Label>비밀번호</Form.Label>*/}
-                                <Form.Control type="password" placeholder="🔑 비밀번호를 입력해주세요"
-                                              onChange={(e) => setPassword(e.target.value)}/>
-                            </Form.Group>
-                            <Form.Group className="mb-3" controlId="formBasicPassword">
-                                <Form.Control type="password" placeholder="🔑 비밀번호를 한번 더 입력해주세요"
-                                              onChange={(e) => setPasswordCheck(e.target.value)}/>
-                            </Form.Group>
-                            <div className="d-grid gap-2">
-                                <Button
-                                    variant="primary"
-                                    style={{backgroundColor: "6c757d", fontWeight: "600"}}
-                                    onClick={signUpWithEmailPassword}>
-                                    이메일/비밀번호로 가입하기
-                                </Button>
-                                <span className="likebutton" onClick={() => {
-                                    setNewUser(false)
-                                }}>
-                            <Form.Text className="text-muted">
-                                <b>이미 가입한 계정이</b> 있으신가요?
-                            </Form.Text>
-                                </span>
-                                <span className="likebutton" onClick={signInWithGoogle}>
-                            <Form.Text className="text-muted">
-                                <b>Google 계정을</b> 이용하여 로그인하고 싶으신가요?
-                            </Form.Text>
-                                </span>
-                            </div>
-                        </Col>
-                        <Col className="desktop-view">
-                        </Col>
-                    </Row>
-
-
-
-                </Container>
-            </div>
-        )
-    }
     return (
-        <Container>
-            <Row>
-                <div className="loading_box">
-                    <span className="desktop-view">
-                마음챙김 다이어리를 이용하기 위해<br/><b>로그인이 필요합니다</b> 🔒
-            </span>
-                    <span className="smartphone-view">
-                다이어리를 이용하시려면<br/><b>로그인이 필요합니다</b> 🔒
-            </span>
-                </div>
-            </Row>
+        <Box minH={'calc(100vh - 130px)'} alignContent="center" mx='12px'>
+            <Flex flexDir={'column'} justifyContent={'center'} alignItems={'center'} mt='-100px'>
+            <Text fontSize={'20px'} fontWeight={400} mb='0px'>나만의 일기로 상담사를 만나요🙂</Text>
+            <Text fontSize={'32px'} fontWeight={700}>로그인 하기</Text>
+            <Input placeholder="✉️ 이메일 주소를 입력해주세요" type="email" onChange={(e) => setEmail(e.target.value)}  mb='12px'/>
+            <Input  placeholder="🔑 비밀번호를 입력해주세요" type="password" onChange={(e) => setPassword(e.target.value)} mb='30px'/>
+            <Button   
+                backgroundColor={ColorSigniture}
+                color={'white'}
+                width={'100%'} 
+                borderRadius={'20px'}
+                onClick={signInWithEmailPassword}>
+                이메일/비밀번호로 로그인하기</Button>
+            </Flex>
+            <Text mt='12px'><b>로그인에 문제가</b> 있으신가요?</Text>
 
-                <Row>
-                <Col>
-                    <Form.Group className="mb-3" controlId="formBasicEmail">
-                        {/*<Form.Label>이메일 주소</Form.Label>*/}
-                        <Form.Control type="email" placeholder="✉️ 이메일 주소를 입력해주세요"
-                                      onChange={(e) => setEmail(e.target.value)}/>
-                    </Form.Group>
-                    <Form.Group className="mb-3" controlId="formBasicPassword">
-                        {/*<Form.Label>비밀번호</Form.Label>*/}
-                        <Form.Control type="password" placeholder="🔑 비밀번호를 입력해주세요"
-                                      onChange={(e) => setPassword(e.target.value)}/>
-                    </Form.Group>
-
-
-                    <div className="d-grid gap-2">
-                        <Button
-                            variant="primary"
-                            style={{backgroundColor: "007AFF", fontWeight: "600"}}
-                            onClick={signInWithEmailPassword}>
-                            이메일/비밀번호로 로그인하기
-                        </Button>
-
-                        <Button
-                            variant="dark"
-                            style={{backgroundColor: "6c757d", fontWeight: "600"}}
-                            onClick={() => {
-                                setNewUser(true)
-                            }}>
-                            새로운 계정 만들기
-                        </Button>
-                        &nbsp;
-                        <Button
-                            variant="light"
-                            style={{backgroundColor: "6c757d", fontWeight: "600"}}
-                            onClick={signInWithGoogle}>
-                            <img
-                                src="https://companieslogo.com/img/orig/GOOG-0ed88f7c.png?t=1633218227"
-                                alt="Google logo"
-                                style={{width: "20px", height: "20px", marginRight: "8px"}}
-                            />
-                            구글 계정으로 로그인하기
-                        </Button>
-                        <span className="likebutton" onClick={() => {
-                            alert("taewan@kaist.ac.kr 또는 010-9085-2356으로 문의 부탁드립니다.")
-                        }}>
-                            <Form.Text className="text-muted">
-                                <b>로그인에 문제가</b> 있으신가요?
-                            </Form.Text>
-                                </span>
-                    </div>
-                </Col>
-                <Col className="desktop-view">
-                </Col>
-            </Row>
-
-
-
-        </Container>
+        </Box>
     )
 }
 export default Auth;

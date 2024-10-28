@@ -15,7 +15,7 @@ import Form from 'react-bootstrap/Form';
 
 import Card from "react-bootstrap/Card";
 
-import { Flex, Text, Button } from "@chakra-ui/react";
+import { Flex, Text, Button, Box } from "@chakra-ui/react";
 import Toast from 'react-bootstrap/Toast';
 import {BeatLoader, HashLoader} from "react-spinners";
 import "react-datepicker/dist/react-datepicker.css";
@@ -1176,38 +1176,44 @@ function Writing(props) {
 
             <div>
                 {isEvening ? (
-                    <Flex flexDir={'column'}>
-                        <Text>{date}<br/><b>마음챙김 다이어리를<br/>시작합니다</b> 😀</Text>
-                        <Button   
-                            backgroundColor={ColorSigniture}
-                            color={'white'}
-                            onClick={() => {
-                                const newSession = String(Math.floor(Date.now() / 1000));
-                                setSession(newSession)
-                                createNewDoc(newSession)
-                                sendEmail()
-                            }}>📝 일기 작성하기</Button>
-                            <Text> 종료되지 않은 세션을 이어 진행하려면<br/>아래에서 진행중인 세션을 선택해주세요</Text>
-                            <Row xs={'auto'} md={1} className="g-4">
-                            {existing.map((_, idx) => (
-                                <Col   key={idx}>
-                                    <Button 
-                                 
-                                        variant="dark"
-                                        style={{backgroundColor: "007AFF", fontWeight: "400"}}
-                                        onClick={() => {
-                                            const newSession = String(existing[idx]["sessionStart"]);
-                                            setSession(newSession)
-                                            createNewDoc(newSession)
-                                        }}>
-                                        {Unix_timestamp(existing[idx]["sessionStart"])}
-                                    </Button>
-                                </Col>
-                            ))}
+                    <Box minH={'calc(100vh - 130px)'} alignContent="center" mx='12px'>
+                        <Flex flexDir={'column'} >
+                            <Text fontSize={'24px'}>{date}<br/><b>마음챙김 다이어리를<br/>시작합니다</b> 😀</Text>
+                            <Button   
+                                backgroundColor={ColorSigniture}
+                                color={'white'}
+                                borderRadius={'20px'}
+                                onClick={() => {
+                                    const newSession = String(Math.floor(Date.now() / 1000));
+                                    setSession(newSession)
+                                    createNewDoc(newSession)
+                                    sendEmail()
+                                }}>📝 일기 작성하기</Button>
+                                <Text mt={'20px'} fontWeight={500}> 종료되지 않은 세션을 이어 진행하려면<br/>아래에서 진행중인 세션을 선택해주세요</Text>
+                                <Row xs={'auto'} md={1} className="g-4">
+                                {existing.map((_, idx) => (
+                                    <Col     key={idx}>
+                                        <Button 
+                                      
+                                           backgroundColor="007AFF"
+                                           fontWeight="400"
+                              
+                                           onClick={() => {
+                                                const newSession = String(existing[idx]["sessionStart"]);
+                                                setSession(newSession)
+                                                createNewDoc(newSession)
+                                            }}>
+                                            {Unix_timestamp(existing[idx]["sessionStart"])}
+                                        </Button>
+                                        </Col>
+
+                  
+                                ))}
 
 
-                        </Row>
-                    </Flex>
+                            </Row>
+                        </Flex>
+                    </Box>
                 ) : (
                     <Container>
                         <Row>

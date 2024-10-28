@@ -5,7 +5,7 @@ import Col from 'react-bootstrap/Col';
 import React from 'react';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
-
+import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import {
     collection,
@@ -20,8 +20,6 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../firebase-config";
-import { Flex, Text, Box, Button } from "@chakra-ui/react";
-import { ColorButtomPink } from "../utils/_Palette";
 
 
 /* eslint-disable no-inner-declarations */
@@ -384,45 +382,77 @@ function DiaryList(props) {
 
     if (emptyList === true) {
         return (
-            <Box minH={'calc(100vh - 130px)'} >
-                <Flex flexDir={'column'} mx='12px' mt='20px'>
-                   <Text fontWeight={700} fontSize={'24px'} mb='5px'>환자 일기 피드백</Text>
-                  <Text fontWeight={400} fontSize={'15px'}>🥲 아직 작성한 일기가 없어요.<br/> 첫 일기를 작성해볼까요?</Text>         
-               </Flex>
-               </Box>
+            <div>
+                <Container>
+                    <Row>
+                        <Col>
+                            <div className="diarylist_box">
+                                <div className="desktop-view">환자 일기 피드백</div>
+                                <div className="smartphone-view-text">환자 일기 피드백</div>
+                            </div>
+                            <div className="loading_box_home_bottom">
+                                <span className="desktop-view">
+                                    🥲 아직 작성한 일기가 없어요. 첫 일기를 작성해볼까요?
+                                </span>
+                                <span className="smartphone-view-text">
+                                    🥲 아직 작성한 일기가 없어요. 첫 일기를 작성해볼까요?
+                                </span>
+                            </div>
+                        </Col>
+                    </Row>
+                </Container>
+            </div>
         );
     } else {
         return (
-            <Box minH={'calc(100vh - 130px)'} >
-                 <Flex flexDir={'column'} mx='12px' mt='20px'>
-                   <Text fontWeight={700} fontSize={'20px'} mb='5px'>일기 피드백</Text>
-                  <Text fontWeight={700} fontSize={'20px'}>피드백 미완료: {unfinishedFeedbackCount}</Text>  
-                  {diaryList.map((diary, idx) => (
-                    <>
-                        <Flex key={idx} flexDir={'column'}  padding='12px' mb='15px' borderRadius={'10px'} backgroundColor={'#FFFCE0'}>
-                            <Text fontSize={'16px'} fontWeight={700} mb='2px'>{diary.sessionEnd ? Unix_timestamp(diary["sessionEnd"]) : "작성일 없음"}</Text>
-                            <Text  fontSize={'14px'} fontWeight={400} mb='5px'> {diary.sessionEnd ? Unix_timestamp2(diary["sessionEnd"]) : "작성 시간 없음"}</Text>
-                            {userType === "doctor" && (
-                                    <div className="nav_title_blue">환자 이메일: {diary.patientEmail}
-                                        <Button
-                                            variant="secondary"
-                                            onClick={() => handlePromptEdit(diary.patientEmail)}
-                                        > 프롬프트 확인/수정 </Button>
-                                     </div>
-                            )}
-                              <Button
-                               backgroundColor={ColorButtomPink}
-                               borderRadius={'20px'}
-                               fontSize={'15px'}
-                               my='10px'
-                               height={'30px'}
-                               onClick={() => handleDiagnosisView(diary.patientEmail, Unix_timestamp_to_YYYYMMDD(diary["sessionEnd"]))}
-                             > 이날의 AI 진단 보기</Button>
-                             <Text  fontSize={'14px'} fontWeight={500} >{diary["diary"]}</Text>
-                             <Flex>
-                             <Text onClick={() => addLike(idx)} mr={'10px'}>️❤️</Text> <b>{diary["like"]}</b>
-                             <Text className="likebutton" onClick={() => addMuscle(idx)}  mr={'10px'}>&nbsp;&nbsp;&nbsp;💪️ </Text><b>{diary["muscle"]}</b>
-                             </Flex>
+            <div>
+                <Container>
+                    <Row>
+                        <Col>
+                            <div className="diarylist_box">
+                                <div className="desktop-view">일기 피드백</div>
+                                <div className="smartphone-view-text">일기 피드백</div>
+                                <div className="desktop-view">피드백 미완료: {unfinishedFeedbackCount}</div>
+                                <div className="smartphone-view-text">피드백 미완료: {unfinishedFeedbackCount}</div>
+                            </div>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <div className="desktop-view">
+                            <div className="writing_box">
+                                <Row xs={'auto'} md={1} className="g-4">
+                                    {diaryList.map((diary, idx) => (
+                                        <Col key={idx}>
+                                            <Card style={{ width: '100%' }}>
+                                                <Card.Body>
+                                                    <Card.Title>{diary.sessionEnd ? Unix_timestamp(diary["sessionEnd"]) : "작성일 없음"}</Card.Title>
+                                                    <Card.Subtitle className="mb-2 text-muted">
+                                                        <div className="nav_title_blue desktop-view">
+                                                            {diary.sessionEnd ? Unix_timestamp2(diary["sessionEnd"]) : "작성 시간 없음"}
+                                                        </div>
+                                                        <div className="nav_title_blue smartphone-view-text">
+                                                            {diary.sessionEnd ? Unix_timestamp2(diary["sessionEnd"]) : "작성 시간 없음"}
+                                                        </div>
+                                                        {userType === "doctor" && (
+                                                            <div className="nav_title_blue">환자 이메일: {diary.patientEmail}
+                                                                <Button
+                                                                    variant="secondary"
+                                                                    onClick={() => handlePromptEdit(diary.patientEmail)}
+                                                                >
+                                                                    프롬프트 확인/수정
+                                                                </Button>
+                                                            </div>
+                                                        )}
+                                                        <Button
+                                                            variant="info"
+                                                            onClick={() => handleDiagnosisView(diary.patientEmail, Unix_timestamp_to_YYYYMMDD(diary["sessionEnd"]))}
+                                                        >
+                                                            이날의 AI 진단 보기
+                                                        </Button>
+                                                    </Card.Subtitle>
+                                                    <Card.Text>{diary["diary"]}</Card.Text>
+                                                    <span className="likebutton" onClick={() => addLike(idx)}>️❤️</span> <b>{diary["like"]}</b>
+                                                    <span className="likebutton" onClick={() => addMuscle(idx)}>&nbsp;&nbsp;&nbsp;💪️ </span><b>{diary["muscle"]}</b>
                                                     {userType === "doctor" ? (
                                                         <>
                                                             {editingFeedback[idx] ? (
@@ -456,10 +486,88 @@ function DiaryList(props) {
                                                             <strong>저장된 피드백:</strong> {diary.feedback || "아직 피드백이 없습니다."}
                                                         </div>
                                                     )}
-                        </Flex>
-                    </>
-                                  
-                    ))}    
+                                                </Card.Body>
+                                            </Card>
+                                        </Col>
+                                    ))}
+                                    <div className="footer"></div>
+                                </Row>
+                            </div>
+                        </div>
+                        <div className="smartphone-view-text">
+                            <div className="writing_box">
+                                <Row xs={'auto'} md={1} className="g-4">
+                                    {diaryList.map((diary, idx) => (
+                                        <Col key={idx}>
+                                            <Card style={{ width: '100%' }}>
+                                                <Card.Body>
+                                                    <Card.Title>{diary.sessionEnd ? Unix_timestamp(diary["sessionEnd"]) : "작성일 없음"}</Card.Title>
+                                                    <Card.Subtitle className="mb-2 text-muted">
+                                                        <div className="nav_title_blue desktop-view">
+                                                            {diary.sessionEnd ? Unix_timestamp2(diary["sessionEnd"]) : "작성 시간 없음"}
+                                                        </div>
+                                                        <div className="nav_title_blue smartphone-view-text">
+                                                            {diary.sessionEnd ? Unix_timestamp2(diary["sessionEnd"]) : "작성 시간 없음"}
+                                                        </div>
+                                                        {userType === "doctor" && (
+                                                            <div className="nav_title_blue">환자 이메일: {diary.patientEmail}
+                                                                <Button
+                                                                    variant="secondary"
+                                                                    onClick={() => handlePromptEdit(diary.patientEmail)}
+                                                                >
+                                                                    프롬프트 확인/수정
+                                                                </Button>
+                                                            </div>
+                                                        )}
+                                                    </Card.Subtitle>
+                                                    <Card.Text>{diary["diary"]}</Card.Text>
+                                                    <span className="likebutton" onClick={() => addLike(idx)}>️❤️</span> <b>{diary["like"]}</b>
+                                                    <span className="likebutton" onClick={() => addMuscle(idx)}>&nbsp;&nbsp;&nbsp;💪️ </span><b>{diary["muscle"]}</b>
+
+                                                    {userType === "doctor" ? (
+                                                        <>
+                                                            {editingFeedback[idx] ? (
+                                                                <Form.Group controlId={`feedbackForm-${idx}`}>
+                                                                    <Form.Label>피드백 입력:</Form.Label>
+                                                                    <Form.Control
+                                                                        as="textarea"
+                                                                        rows={3}
+                                                                        value={feedback[idx] || ""}
+                                                                        onChange={(e) => handleFeedbackChange(idx, e.target.value)}
+                                                                    />
+                                                                    <Button
+                                                                        variant="primary"
+                                                                        onClick={() => handleFeedbackSubmit(idx, diary.patientEmail, diary.sessionNumber)}
+                                                                    >
+                                                                        피드백 저장
+                                                                    </Button>
+
+                                                                </Form.Group>
+                                                            ) : (
+                                                                <div>
+                                                                    <strong>저장된 피드백:</strong> {diary.feedback || "피드백을 입력하세요"}
+                                                                    <Button variant="link" onClick={() => toggleFeedbackEdit(idx)}>
+                                                                        {diary.feedback ? "수정하기" : "입력하기"}
+                                                                    </Button>
+                                                                </div>
+                                                            )}
+                                                        </>
+                                                    ) : (
+                                                        <div>
+                                                            <strong>저장된 피드백:</strong> {diary.feedback || "아직 피드백이 없습니다."}
+                                                        </div>
+                                                    )}
+                                                </Card.Body>
+                                            </Card>
+                                        </Col>
+                                    ))}
+                                    <div className="footer"></div>
+                                </Row>
+                            </div>
+                        </div>
+                    </Row>
+                </Container>
+                <div className="desktop-view">
                     <Modal show={showModal} onHide={() => setShowModal(false)} centered>
                         <Modal.Header closeButton>
                             <Modal.Title>프롬프트 수정</Modal.Title>
@@ -484,8 +592,34 @@ function DiaryList(props) {
                             </Button>
                         </Modal.Footer>
                     </Modal>
-      
- 
+                </div>
+                <div className="smartphone-view-text">
+                    <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+                        <Modal.Header closeButton>
+                            <Modal.Title>프롬프트 수정</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <Form.Group controlId="promptTextarea">
+                                <Form.Label>현재 프롬프트:</Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    rows={3}
+                                    value={currentPrompt}
+                                    onChange={(e) => setCurrentPrompt(e.target.value)}
+                                />
+                            </Form.Group>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={() => setShowModal(false)}>
+                                취소
+                            </Button>
+                            <Button variant="primary" onClick={savePrompt}>
+                                저장
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+                </div>
+                <div className="desktop-view">
                 <Modal show={showDiagnosisModal} onHide={() => setShowDiagnosisModal(false)} centered>
                     <Modal.Header closeButton>
                         <Modal.Title>AI 진단 결과</Modal.Title>
@@ -504,9 +638,28 @@ function DiaryList(props) {
                         </Button>
                     </Modal.Footer>
                 </Modal>
-         
-               </Flex>
-            </Box>
+                </div>
+                <div className="smartphone-view-text">
+                <Modal show={showDiagnosisModal} onHide={() => setShowDiagnosisModal(false)} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>AI 진단 결과</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <h5>상담사 모델 진단:</h5>
+                        <p>{aiDiagnosis.counselorDiagnosis}</p>
+                        <h5>의사 모델 진단:</h5>
+                        <p>{aiDiagnosis.doctorDiagnosis}</p>
+                        <h5>Pocket-Mind 모델 진단:</h5>
+                        <p>{aiDiagnosis.pocketMindDiagnosis}</p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowDiagnosisModal(false)}>
+                            닫기
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+                </div>
+            </div>
         );
     }
 }
