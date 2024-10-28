@@ -5,17 +5,20 @@ import { ColorButtomGray, ColorButtomPink } from "../../utils/_Palette";
 
 function Userinput({prompt,setInputUser, inputUser,addConversationFromUser, setLoading, turnCount, setDiary, textInput, setTextInput, toggleListening, isListening, setShow,  show}) {
     const temp_comment_input = useRef("");
+    const today = new Date();
+    const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
     return (
-        <Box minH={'calc(100vh - 130px)'} mx='12px'>
+        <Box maxW={'450px'}>
         <Flex flexDir={'column'} > 
         <Flex alignItems="center">
         <Image src='/image/joural.png' w='40px' h='40px' mr='10px' />
-        <Text mt='20px' display="flex" alignItems="center" textAlign="center">Poket-mind와 정리하는 10/19</Text>
+        <Text fontWeight={700} fontSize={'18px'} mt='20px' display="flex">Poket-mind와 정리하는<br/> {formattedDate}</Text>
         </Flex>
-        <Text>오늘 하루는 어땠나요? 오늘은 어떤 고민이 있었나요? 함께 이야기 해봐요🙂</Text>
-            <Flex>
+        <Text fontWeight={400} fontSize={'14px'}>오늘 하루는 어땠나요? 오늘은 어떤 고민이 있었나요? <br/>함께 이야기 해봐요🙂</Text>
+            <Flex mt={'10px'} align={'center'}>
                 <Image src='/image/doctor.png' w='43px' h='40px' justifyContent={'center'} mr='12px' mb='12px'/>
-                <Text>{prompt}</Text>
+                <Text  fontWeight={700} fontSize={'14px'}>{prompt}</Text>
             </Flex>
             <Flex mb={'10px'}>
                 <Textarea
@@ -28,10 +31,10 @@ function Userinput({prompt,setInputUser, inputUser,addConversationFromUser, setL
                     maxLength={1000}
                     variant="unstyled"
                     
-                    _placeholder={{ color: '#b8bcc8', fontWeight: '400' }}
+                    _placeholder={{ color: '#b8bcc8', fontWeight: '400', fontSize:'12px'}}
                 />
                 </Flex>
-                <Text> 📖 3턴이 넘어가면 다이어리가 자동으로 생성됩니다. </Text>
+                <Text  fontWeight={700} fontSize={'12px'}> 📖 3턴이 넘어가면 다이어리가 자동으로 생성됩니다. </Text>
                 <Flex width={'100%'}    justifyContent="space-between">
                     <Button
                          w="48%"
