@@ -12,7 +12,7 @@ function NoDiary({ userName, diaryList, lastDate, navigateToWriting, navigateToR
               justifyContent={'center'}  my='30px'> <Image src='/image/diary.png' w='198px' h='206px' justifyContent={'center'}  /></Flex>
           <Flex alignItems={'center'}
               justifyContent={'center'} textAlign={'center'}  my='30px'> 
-            <Button backgroundColor={ColorSigniture}  color={'white'} w='100%' h='43px' borderRadius='20px' onClick={navigateToWriting} textAlign={'center'}>오늘 하루 기록하기</Button>
+            <Button backgroundColor={ColorSigniture}  color={'white'} w='100%' h='43px' borderRadius='20px' onClick={navigateToWriting} textAlign={'center'}>Journaling Today</Button>
         </Flex>
 
         <Flex alignItems={'center'} justifyContent={'center'}textAlign={'center'}> 

@@ -13,9 +13,9 @@ function Userinput({prompt,setInputUser, inputUser,addConversationFromUser, setL
         <Flex flexDir={'column'} > 
         <Flex alignItems="center">
         <Image src='/image/joural.png' w='40px' h='40px' mr='10px' />
-        <Text fontWeight={700} fontSize={'18px'} mt='20px' display="flex">Poket-mind와 정리하는<br/> {formattedDate}</Text>
+        <Text fontWeight={700} fontSize={'18px'} mt='20px' display="flex">Poket-mind with Organize<br/> {formattedDate}</Text>
         </Flex>
-        <Text fontWeight={400} fontSize={'14px'}>오늘 하루는 어땠나요? 오늘은 어떤 고민이 있었나요? <br/>함께 이야기 해봐요🙂</Text>
+        <Text fontWeight={400} fontSize={'14px'}>How was your day? What challenges did you face today? <br/>Let’s talk about it together 🙂</Text>
             <Flex mt={'10px'} align={'center'}>
                 <Image src='/image/doctor.png' w='43px' h='40px' justifyContent={'center'} mr='12px' mb='12px'/>
                 <Text  fontWeight={700} fontSize={'14px'}>{prompt}</Text>
@@ -26,7 +26,7 @@ function Userinput({prompt,setInputUser, inputUser,addConversationFromUser, setL
                     onChange={(e) => setTextInput(e.target.value)}
                     // resize={'none'}
                     height={'222px'}
-                    placeholder="편안하고 자유롭게 최근에 있었던 일을 작성해주세요 :)"
+                    placeholder="Feel free to write about anything recent in a comfortable and open way. :)"
                     textStyle={'md'}
                     maxLength={1000}
                     variant="unstyled"
@@ -34,7 +34,7 @@ function Userinput({prompt,setInputUser, inputUser,addConversationFromUser, setL
                     _placeholder={{ color: '#b8bcc8', fontWeight: '400', fontSize:'12px'}}
                 />
                 </Flex>
-                <Text  fontWeight={700} fontSize={'12px'}> 📖 3턴이 넘어가면 다이어리가 자동으로 생성됩니다. </Text>
+                <Text  fontWeight={700} fontSize={'12px'}> 📖 After 3 turns, the diary will be automatically created. </Text>
                 <Flex width={'100%'}    justifyContent="space-between">
                     <Button
                          w="48%"
@@ -43,7 +43,7 @@ function Userinput({prompt,setInputUser, inputUser,addConversationFromUser, setL
                             backgroundColor={ColorButtomGray}
                             textColor={'white'}
                             onClick={toggleListening}>
-                            {isListening ? '🛑 응답 종료하기' : '🎙️ 목소리로 응답하기'}
+                            {isListening ? '🛑 End Response' : '🎙️ with Voice'}
                     </Button>
                     <Button
                         backgroundColor={ColorButtomPink}
@@ -54,7 +54,7 @@ function Userinput({prompt,setInputUser, inputUser,addConversationFromUser, setL
                         onClick={() => {
                             (function () {
                                 if (textInput.length < 10) {
-                                    alert("입력한 내용이 너무 짧아요. 조금만 더 입력해볼까요?")
+                                    alert("Your entry is a bit short. How about adding a bit more?")
                                 } else if (isListening === true) {
                                     toggleListening()
                                     addConversationFromUser(textInput, temp_comment_input.current)
@@ -62,7 +62,7 @@ function Userinput({prompt,setInputUser, inputUser,addConversationFromUser, setL
                                     addConversationFromUser(textInput, temp_comment_input.current)
                                 }
                             })()
-                        }}>💬 응답 전송하기
+                        }}>💬 Send Response
                     </Button>
                 </Flex>
 

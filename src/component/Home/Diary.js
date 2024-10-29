@@ -14,12 +14,12 @@ function Diary({ userName, diaryList, lastDate, navigateToWriting, navigateToRev
                   justifyContent={'center'}  my='30px'> <Image src='/image/diary.png' w='198px' h='206px' justifyContent={'center'}  /></Flex>
               <Flex alignItems={'center'}
                   justifyContent={'center'} textAlign={'center'}  my='30px'> 
-                <Button backgroundColor={ColorSigniture}  color={'white'} w='100%' h='43px' borderRadius='20px' onClick={navigateToWriting} textAlign={'center'}>오늘 하루 기록하기</Button>
+                <Button backgroundColor={ColorSigniture}  color={'white'} w='100%' h='43px' borderRadius='20px' onClick={navigateToWriting} textAlign={'center'}>Journaling Today</Button>
             </Flex>
 
             <Flex alignItems={'center'} justifyContent={'center'}textAlign={'center'}> 
                       <Text>        Last Date With Poket-minde <b>{Unix_timestamp(lastDate)}</b> <br/>
-                        📖 지금까지 <b>{diaryList.length}</b>개의 일기를 작성하셨네요!</Text>
+                        📖 You’ve written  <b>{diaryList.length}</b> journal entries so far!</Text>
             </Flex>
         </Flex>
         </Box>

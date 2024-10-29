@@ -84,19 +84,19 @@ export const Auth = (props) => {
     return (
         <Box minH={'calc(100vh - 130px)'} alignContent="center" mx='12px'>
             <Flex flexDir={'column'} justifyContent={'center'} alignItems={'center'} mt='-100px'>
-            <Text fontSize={'20px'} fontWeight={400} mb='0px'>나만의 일기로 상담사를 만나요🙂</Text>
-            <Text fontSize={'32px'} fontWeight={700}>로그인 하기</Text>
-            <Input placeholder="✉️ 이메일 주소를 입력해주세요" type="email" onChange={(e) => setEmail(e.target.value)}  mb='12px'/>
-            <Input  placeholder="🔑 비밀번호를 입력해주세요" type="password" onChange={(e) => setPassword(e.target.value)} mb='30px'/>
+            <Text fontSize={'20px'} fontWeight={400} mb='0px'>Meet your personal counselor through your own diary 🙂</Text>
+            <Text fontSize={'32px'} fontWeight={700}>Log In</Text>
+            <Input placeholder="✉️ Please enter your email address" type="email" onChange={(e) => setEmail(e.target.value)}  mb='12px'/>
+            <Input  placeholder="🔑 Please enter your password" type="password" onChange={(e) => setPassword(e.target.value)} mb='30px'/>
             <Button   
                 backgroundColor={ColorSigniture}
                 color={'white'}
                 width={'100%'} 
                 borderRadius={'20px'}
                 onClick={signInWithEmailPassword}>
-                이메일/비밀번호로 로그인하기</Button>
+           Log In with Email/Password</Button>
             </Flex>
-            <Text mt='12px'><b>로그인에 문제가</b> 있으신가요?</Text>
+            <Text mt='12px'>Having trouble logging in?</Text>
 
         </Box>
     )

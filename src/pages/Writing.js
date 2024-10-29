@@ -71,7 +71,7 @@ function Writing(props) {
     const notSpoken = useRef(true)
     const navigate = useNavigate()
     const current = new Date();
-    const date = `${current.getFullYear()}년 ${current.getMonth() + 1}월 ${current.getDate()}일`;
+    const date = `${current.getFullYear()}year ${current.getMonth() + 1}month ${current.getDate()}day`;
 
     
 
@@ -1178,7 +1178,7 @@ function Writing(props) {
                 {isEvening ? (
                     <Box minH={'calc(100vh - 130px)'} alignContent="center" mx='12px'>
                         <Flex flexDir={'column'} >
-                            <Text fontSize={'24px'}>{date}<br/><b>마음챙김 다이어리를<br/>시작합니다</b> 😀</Text>
+                            <Text fontSize={'24px'}>{date}<br/>Starting your mindfulness diary😀</Text>
                             <Button   
                                 backgroundColor={ColorSigniture}
                                 color={'white'}
@@ -1188,8 +1188,8 @@ function Writing(props) {
                                     setSession(newSession)
                                     createNewDoc(newSession)
                                     sendEmail()
-                                }}>📝 일기 작성하기</Button>
-                                <Text mt={'20px'} fontWeight={500}> 종료되지 않은 세션을 이어 진행하려면<br/>아래에서 진행중인 세션을 선택해주세요</Text>
+                                }}>📝 Start Journaling</Button>
+                                <Text mt={'20px'} fontWeight={500}> To continue an unfinished session,<br/>please select an active session below</Text>
                                 <Row xs={'auto'} md={1} className="g-4">
                                 {existing.map((_, idx) => (
                                     <Col     key={idx}>
