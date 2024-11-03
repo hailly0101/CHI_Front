@@ -50,6 +50,17 @@ export const Auth = (props) => {
         }
     }
 
+    const triggerCall = () => {
+        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.callKitHandler) {
+            console.log("Native bridge available, sending message to iOS");
+            window.webkit.messageHandlers.callKitHandler.postMessage("triggerCall");
+        } else {
+            console.warn("Native bridge not available.");
+        }
+    };
+    
+
+
     const signUpWithEmailPassword = async () => {
         if (password !== passwordCheck) {
             alert("비밀번호가 일치하지 않습니다. 동일한 비밀번호를 입력해주세요");
@@ -97,6 +108,8 @@ export const Auth = (props) => {
            Log In with Email/Password</Button>
             </Flex>
             <Text mt='12px'>Having trouble logging in?</Text>
+      
+            <Button onClick={()=>triggerCall()}>전화 알림 테스트</Button>
 
         </Box>
     )
