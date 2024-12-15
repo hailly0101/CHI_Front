@@ -22,6 +22,7 @@ import {doc, getDoc} from "firebase/firestore";
 import { getToken } from 'firebase/messaging';
 import TopNav from './component/common/TopNav';
 import BottomNav from './component/common/BottomNav';
+import DiaryMock from "./pages/Result"
 
 const cookies = new Cookies();
 
@@ -133,7 +134,7 @@ function App() {
                                <Auth setIsAuth={setIsAuth} setUserName={setUserName} setUserMail={setUserMail}/>)
                            }/>
                     <Route path="/list"
-                           element={isAuth ? (<div><DiaryList userName={userName} userMail={userMail} number={3} /><BottomNav number={3}/></div>) : (
+                           element={isAuth ? (<div><DiaryMock /><BottomNav number={3}/></div>) : (
                                <Auth setIsAuth={setIsAuth} setUserName={setUserName} setUserMail={setUserMail}/>)}/>
                     <Route path="/loading" element={<div><Loading/></div>}/>
                     <Route path="*" element={<div>404~ 없는페이지임</div>}/>
