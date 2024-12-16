@@ -6,20 +6,17 @@ import React from 'react';
 import useSize from './component/common/useSize';
 import { extendTheme, ChakraProvider, StyleFunctionProps } from "@chakra-ui/react";
 import {useState, useEffect} from "react";
-import {Routes, Route, useNavigate} from 'react-router-dom';
+import {Routes, Route} from 'react-router-dom';
 
-import { messaging } from './firebase-config';
 import Auth from './pages/Auth';
 import Cookies from 'universal-cookie';
-import {signOut} from 'firebase/auth';
-import {auth, db} from './firebase-config';
+
 
 import Writing from "./pages/Writing";
 import Loading from "./pages/Loading";
 import DiaryList from "./pages/DiaryList";
 import Home from "./pages/Home";
-import {doc, getDoc} from "firebase/firestore";
-import { getToken } from 'firebase/messaging';
+
 import TopNav from './component/common/TopNav';
 import BottomNav from './component/common/BottomNav';
 import DiaryMock from "./pages/Result"
@@ -28,66 +25,7 @@ const cookies = new Cookies();
 
 function App() {
     const { height } = useSize();
-    useEffect(() => {
-        async function requestPermission() {
-            console.log("권한 요청 중...");
-            const permission = await Notification.requestPermission();
-            if (permission === "granted") {
-                console.log("알림 권한이 허용됨");
-                try {
-                    const currentToken = getToken(messaging, {
-                        vapidKey: 'BHxLI9MyVyff7V0GVCp4n6sxF3LwarXbJHHbx1wO2SSil7bgJMy0AiYhONPMrMFpYZ2G6FyDO_AYmHqs-sDJ4p0'
-                        
-                    });
-                    console.log(currentToken)
-
-
-                } catch (error) {
-                    console.error("Error getting token", error);
-                }
-            } else {
-                console.log("알림 권한 허용 안함")
-            }
-            
-        }
-
-        requestPermission();
-    }, []);
-
-    let navigate = useNavigate()
-
-    //firebase setting
-    const [isAuth, setIsAuth] = useState(cookies.get("auth-token"))
-    const [userName, setUserName] = useState('')
-    const [userMail, setUserMail] = useState('')
-    const [diaryCount, setDiaryCount] = useState(null)
-    const current = new Date();
-    const date = `${current.getFullYear()}년 ${current.getMonth() + 1}월 ${current.getDate()}일`;
-
-
-    useEffect(()=>{
-        setIsAuth(cookies.get("auth-token"))
-    }, [cookies.get("auth-token")])
-    
-    async function settingName() {
-        const docRef = doc(db, 'prompt', 'module1_1');
-        
-        const docSnap = await getDoc(docRef);
-        var user = await (auth.currentUser.displayName)
-        var mail = await (auth.currentUser.email)
-        setUserName(user)
-        setUserMail(mail)
-    }
-
-    useEffect(() => {
-        settingName()
-    })
-
-    const signUserOut = async () => {
-        await signOut(auth)
-        cookies.remove("auth-token")
-        setIsAuth(false)
-    }
+  
     const styles = {
         global: (props: StyleFunctionProps) => ({
           html: {
