@@ -190,43 +190,43 @@ function DiaryList(props) {
     }
 
     async function sendDiaryNotificationToBackend(email, Content) {
-        try {
-            console.log("Starting to send notification to backend...");
-            console.log("email:", email);
-            console.log("Diary content (first 20 characters):", Content.slice(0, 20));
-            console.log(userType)
-            const notificationTitle = userType === "patient"
-                ? `${props.userMail} 환자 일기 알림`  // 환자가 접속한 경우 담당 의사에게 보낼 제목 (환자 이메일 포함)
-                : '새로운 피드백 알림';  // 의사가 접속한 경우 환자에게 보낼 제목
+        // try {
+        //     console.log("Starting to send notification to backend...");
+        //     console.log("email:", email);
+        //     console.log("Diary content (first 20 characters):", Content.slice(0, 20));
+        //     console.log(userType)
+        //     const notificationTitle = userType === "patient"
+        //         ? `${props.userMail} 환자 일기 알림`  // 환자가 접속한 경우 담당 의사에게 보낼 제목 (환자 이메일 포함)
+        //         : '새로운 피드백 알림';  // 의사가 접속한 경우 환자에게 보낼 제목
 
-            const notificationBody = userType === "patient"
-                ? `${props.userMail} 환자가 새로운 일기를 작성했습니다: ${Content.slice(0, 20)}...`  // 환자가 접속했으니 의사에게 보낼 메시지 (환자 이메일 포함)
-                : `담당 상담사(의사)가 새로운 피드백을 남겼습니다`;  // 의사가 접속했으니 환자에게 보낼 피드백 메시지
+        //     const notificationBody = userType === "patient"
+        //         ? `${props.userMail} 환자가 새로운 일기를 작성했습니다: ${Content.slice(0, 20)}...`  // 환자가 접속했으니 의사에게 보낼 메시지 (환자 이메일 포함)
+        //         : `담당 상담사(의사)가 새로운 피드백을 남겼습니다`;  // 의사가 접속했으니 환자에게 보낼 피드백 메시지
 
-            const response = await fetch('https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/fcm/send-notification', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: email,
-                    title: notificationTitle,
-                    body: notificationBody,
-                    userType: userType
-                }),
-            });
-            console.log("Fetch request sent. Waiting for response...");
+        //     const response = await fetch('https://pocket-mind-bot-43dbd1ff9e7a.herokuapp.com/fcm/send-notification', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify({
+        //             email: email,
+        //             title: notificationTitle,
+        //             body: notificationBody,
+        //             userType: userType
+        //         }),
+        //     });
+        //     console.log("Fetch request sent. Waiting for response...");
 
-            if (!response.ok) {
-                const errorData = await response.text();
-                console.error('Error sending notification:', errorData);
-            } else {
-                const result = await response.json();
-                console.log('Notification sent successfully:', result);
-            }
-        } catch (error) {
-            console.error('Error sending notification to backend:', error);
-        }
+        //     if (!response.ok) {
+        //         const errorData = await response.text();
+        //         console.error('Error sending notification:', errorData);
+        //     } else {
+        //         const result = await response.json();
+        //         console.log('Notification sent successfully:', result);
+        //     }
+        // } catch (error) {
+        //     console.error('Error sending notification to backend:', error);
+        // }
     }
 
     function Unix_timestamp(t) {
@@ -330,30 +330,30 @@ function DiaryList(props) {
             const userDoc = await getDoc(userDocRef);
 
             if (userDoc.exists()) {
-                const patients = userDoc.data().patient;
-                for (const patientEmail of patients) {
-                    const diaryCompleteCollRef = collection(db, 'session', patientEmail, 'diary');
-                    const q = query(diaryCompleteCollRef, where('isFinished', '==', true));
+                // const patients = userDoc.data().patient;
+                // for (const patientEmail of patients) {
+                //     const diaryCompleteCollRef = collection(db, 'session', patientEmail, 'diary');
+                //     const q = query(diaryCompleteCollRef, where('isFinished', '==', true));
 
-                    try {
-                        const querySnapshot = await getDocs(q);
-                        querySnapshot.forEach((doc) => {
-                            const data = doc.data();
-                            if (data.sessionEnd && data.diary) {
-                                if (!data.feedback) {
-                                    unfinishedFeedbackCount++;
-                                }
-                                tempArr.push({
-                                    ...data,
-                                    patientEmail: patientEmail,
-                                    sessionNumber: doc.id
-                                });
-                            }
-                        });
-                    } catch (error) {
-                        console.error(`Error fetching diary for patient ${patientEmail}:`, error);
-                    }
-                }
+                //     try {
+                //         const querySnapshot = await getDocs(q);
+                //         querySnapshot.forEach((doc) => {
+                //             const data = doc.data();
+                //             if (data.sessionEnd && data.diary) {
+                //                 if (!data.feedback) {
+                //                     unfinishedFeedbackCount++;
+                //                 }
+                //                 tempArr.push({
+                //                     ...data,
+                //                     patientEmail: patientEmail,
+                //                     sessionNumber: doc.id
+                //                 });
+                //             }
+                //         });
+                //     } catch (error) {
+                //         console.error(`Error fetching diary for patient ${patientEmail}:`, error);
+                //     }
+                // }
 
                 tempArr.sort((a, b) => (a.feedback ? 1 : -1));
                 setUnfinishedFeedbackCount(unfinishedFeedbackCount);

@@ -1,26 +1,19 @@
 module.exports = {
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    project: 'tsconfig.json',
-    tsconfigRootDir: __dirname,
-    sourceType: 'module',
-  },
-  plugins: ['@typescript-eslint/eslint-plugin'],
-  extends: [
-    'plugin:@typescript-eslint/recommended',
-    // 내가 작성한 prettier 적용하기
-    'plugin:prettier/recommended',
-  ],
-  root: true,
   env: {
-    node: true,
-    jest: true,
+    browser: true,
+    es2021: true,
   },
-  ignorePatterns: ['.eslintrc.js'],
+  extends: [
+    "eslint:recommended",
+    "plugin:react/recommended", // React를 사용하는 경우
+  ],
+  parserOptions: {
+    ecmaVersion: 12,
+    sourceType: "module",
+  },
+  plugins: ["react"], // 필요한 플러그인만 남김
   rules: {
-    '@typescript-eslint/interface-name-prefix': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
+    "no-unused-vars": "off", // 사용되지 않은 변수 무시
+    "no-undef": "off", // 정의되지 않은 변수 경고 무시
   },
 };
