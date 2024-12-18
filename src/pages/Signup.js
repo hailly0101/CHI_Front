@@ -12,27 +12,34 @@ import { Flex, Text, Box, Input, Button } from "@chakra-ui/react";
 
 import { React, useState } from "react";
 import { ColorSigniture } from "../utils/_Palette";
+import { useNavigate } from "react-router-dom";
 
 export const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
-  const [passwordCheck, setPasswordCheck] = useState("");
-  const [username, setUsername] = useState("");
   const [step, setStep] = useState(1);
   const [goal, setGoal] = useState("");
-
-  const signInWithEmailPassword = async () => {
+  const navigate = useNavigate();
+  const SignupEmail = async () => {
     try {
-      //   const result = await signInWithEmailAndPassword(auth, email, password);
-      //   cookies.set("auth-token", result.user.refreshToken);
-      //   props.setIsAuth(true);
-      //   props.setUserName(auth.currentUser.displayName);
+      const response = await fetch("http://127.0.0.1:8000/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          goal: goal,
+        }),
+      });
+      const data = await response.json();
+      console.log("회원가입 성공!");
+      navigate("/");
     } catch (err) {
       console.error(err);
       if (err.message.includes("wrong-password")) {
         alert(
-          "비밀번호가 틀렸습니다. 비밀번호가 기억나지 않으신다면, taewan@kaist.ac.kr 또는 010-9085-2356으로 연락부탁드립니다."
+          "비밀번호가 틀렸습니다. 비밀번호가 기억나지 않으신다면, haillydev@gmail.com으로 연락주세요"
         );
       } else if (err.message.includes("user-not-found")) {
         alert("계정정보가 없습니다.");
@@ -44,40 +51,13 @@ export const Signup = () => {
     }
   };
 
-  const signUpWithEmailPassword = async () => {
-    if (password !== passwordCheck) {
-      alert("비밀번호가 일치하지 않습니다. 동일한 비밀번호를 입력해주세요");
-    } else {
-      try {
-        const result = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-        await updateProfile(auth.currentUser, {
-          displayName: username,
-        });
-        cookies.set("auth-token", result.user.refreshToken);
-        // props.setIsAuth(true);
-        // props.setUserName(auth.currentUser.displayName);
-        // 회원가입 성공 시 login페이지로 빼주기
-      } catch (err) {
-        console.error(err);
-        if (err.message.includes("email-already-in-use")) {
-          alert(
-            "이미 가입된 이메일입니다. 비밀번호가 기억나지 않으신다면, taewan@kaist.ac.kr 또는 010-9085-2356으로 연락부탁드립니다."
-          );
-        } else if (err.message.includes("invalid-email")) {
-          alert("올바른 이메일 형식이 아닙니다.");
-        } else if (err.message.includes("weak-password")) {
-          alert("비밀번호는 6자 이상으로 설정해주세요");
-        } else {
-          alert("Error: " + err.message);
-        }
-      }
+  const onClickNext = () => {
+    if (password !== password2) {
+      alert("비밀번호가 서로 다릅니다.");
+      return;
     }
+    setStep(2);
   };
-
   return (
     <Box mx="12px" mt="20px">
       <Flex flexDir={"column"}>
@@ -121,7 +101,7 @@ export const Signup = () => {
               color={"white"}
               width={"100%"}
               borderRadius={"20px"}
-              onClick={() => setStep(2)}
+              onClick={() => onClickNext()}
             >
               다음으로
             </Button>
@@ -151,7 +131,7 @@ export const Signup = () => {
             </Text>
             <Button
               width={"100%"}
-              onClick={signInWithEmailPassword}
+              onClick={SignupEmail}
               mt="10px"
               borderRadius={"20px"}
             >

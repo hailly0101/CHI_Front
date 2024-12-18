@@ -22,6 +22,8 @@ import Home from "./pages/Home";
 import {doc, getDoc} from "firebase/firestore";
 import { getToken } from 'firebase/messaging';
 import TopNav from './component/common/TopNav';
+import BottomNav from './component/common/BottomNav';
+
 import Write2 from './pages/Writing2'
 import DiaryMock from './pages/Result'
 
@@ -81,18 +83,13 @@ function App() {
                                 <Auth setIsAuth={setIsAuth} setUserName={setUserName}/>)} */}
                         </div>
                     }/>
-                    <Route path="/home" element={<Home/>}/>
+                    <Route path="/home" element={<><Home/><BottomNav number={1} /></>}/>
                     {/* <Route path="/writing" element={<Writing userName={'Lamda'} userMail={'skku@gmail.com'}/>}/> */}
-                    <Route path="/writing2" element={<Write2 />}/>
-                    {/* <Route path="/writing"
-                           element={isAuth ? (<div><Writing userName={userName} userMail={userMail}/><BottomNav number={2}/></div>) : (
-                               <Auth setIsAuth={setIsAuth} setUserName={setUserName} setUserMail={setUserMail}/>)
-                           }/>
-                    <Route path="/list"
-                           element={isAuth ? (<div><DiaryList userName={userName} userMail={userMail} number={3} /><BottomNav number={3}/></div>) : (
-                               <Auth setIsAuth={setIsAuth} setUserName={setUserName} setUserMail={setUserMail}/>)}/>
-                    <Route path="/loading" element={<div><Loading/></div>}/> */}
-                    <Route path='/list' element={<DiaryMock/>}/>
+                    <Route path="/writing" element={<><Write2/><BottomNav number={2} /></>}/>
+                    <Route path="/list" element={<><DiaryMock/><BottomNav number={3} /></>}/>
+              
+                    <Route path="/loading" element={<div><Loading/></div>}/> 
+
                    <Route path="*" element={<div>404~ 없는페이지임</div>}/>
                     <Route path="/signup" element={<Signup/>}/>
                 </Routes>
