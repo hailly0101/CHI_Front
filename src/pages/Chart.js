@@ -11,11 +11,18 @@ import {
 } from "chart.js";
 
 // 필요한 컴포넌트와 스케일 등록
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
-const DiaryChart = () => {
+const DiaryChart = (chartData) => {
   const data = {
-    labels: ["2024-12-01", "2024-12-02", "2024-12-04", "2024-12-06", "2024-12-07"],
+    labels: chartData.labels,
     datasets: [
       {
         label: "하루 종일 불안해요",

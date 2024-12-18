@@ -28,6 +28,7 @@ import Write2 from './pages/Writing2'
 import DiaryMock from './pages/Result'
 
 import { getEmail, getUserId, setEmail } from './localstorage/user';
+import AllDiary from './pages/AllDiary';
 
 
 
@@ -87,6 +88,7 @@ function App() {
                     {/* <Route path="/writing" element={<Writing userName={'Lamda'} userMail={'skku@gmail.com'}/>}/> */}
                     <Route path="/writing" element={<><Write2/><BottomNav number={2} /></>}/>
                     <Route path="/list" element={<><DiaryMock/><BottomNav number={3} /></>}/>
+                    <Route path="/alldiary" element={<><AllDiary/><BottomNav number={3} /></>}/>
               
                     <Route path="/loading" element={<div><Loading/></div>}/> 
 
