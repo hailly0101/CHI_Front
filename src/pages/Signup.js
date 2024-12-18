@@ -1,18 +1,8 @@
-import { auth, provider } from "../firebase-config";
-import {
-  signInWithPopup,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  updateProfile,
-} from "firebase/auth";
-
-import Cookies from "universal-cookie";
-import { Textarea } from "@chakra-ui/react";
-import { Flex, Text, Box, Input, Button } from "@chakra-ui/react";
-
-import { React, useState } from "react";
-import { ColorSigniture } from "../utils/_Palette";
+import React, { useState } from "react";
+import { Textarea, Flex, Text, Box, Input, Button } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { signup } from "../api/user";
+import { ColorSigniture } from "../utils/_Palette";
 
 export const Signup = () => {
   const [email, setEmail] = useState("");
@@ -21,32 +11,26 @@ export const Signup = () => {
   const [step, setStep] = useState(1);
   const [goal, setGoal] = useState("");
   const navigate = useNavigate();
+
   const SignupEmail = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-          goal: goal,
-        }),
-      });
-      const data = await response.json();
+      // authAPI.js에 정의된 signup 함수 호출
+      await signup({ email, password, goal });
       console.log("회원가입 성공!");
       navigate("/");
     } catch (err) {
       console.error(err);
-      if (err.message.includes("wrong-password")) {
+      const errorMessage = err.response?.data?.message || err.message;
+      if (errorMessage.includes("wrong-password")) {
         alert(
           "비밀번호가 틀렸습니다. 비밀번호가 기억나지 않으신다면, haillydev@gmail.com으로 연락주세요"
         );
-      } else if (err.message.includes("user-not-found")) {
+      } else if (errorMessage.includes("user-not-found")) {
         alert("계정정보가 없습니다.");
-      } else if (err.message.includes("invalid-email")) {
+      } else if (errorMessage.includes("invalid-email")) {
         alert("올바른 이메일 형식이 아닙니다.");
       } else {
-        alert("Error: " + err.message);
+        alert("Error: " + errorMessage);
       }
     }
   };
@@ -58,6 +42,7 @@ export const Signup = () => {
     }
     setStep(2);
   };
+
   return (
     <Box mx="12px" mt="20px">
       <Flex flexDir={"column"}>
@@ -114,7 +99,6 @@ export const Signup = () => {
             <Textarea
               value={goal}
               onChange={(e) => setGoal(e.target.value)}
-              // resize={'none'}
               height={"222px"}
               placeholder=" :)"
               textStyle={"md"}
@@ -127,7 +111,7 @@ export const Signup = () => {
               }}
             />
             <Text fontSize={"15px"} fontWeight={700} mt="15px">
-              ex)불안함을 주리고 싶어요, 우울감을 감소하고 싶어요
+              ex)불안함을 줄이고 싶어요, 우울감을 감소하고 싶어요
             </Text>
             <Button
               width={"100%"}
