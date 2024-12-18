@@ -12,6 +12,7 @@ import { Flex, Text, Box, Input, Button } from "@chakra-ui/react";
 
 import { React, useState } from "react";
 import { ColorSigniture } from "../utils/_Palette";
+import { setUserId } from "../localstorage/user";
 
 export const Auth = () => {
   const [email, setEmail] = useState("");
@@ -21,11 +22,17 @@ export const Auth = () => {
   const navigate = useNavigate();
   const signInWithEmailPassword = async () => {
     try {
-      //   const result = await signInWithEmailAndPassword(auth, email, password);
-      //   cookies.set("auth-token", result.user.refreshToken);
-      //   props.setIsAuth(true);
-      //   props.setUserName(auth.currentUser.displayName);
-      //회원가입 성공 시 home 페이지로 빼주고 Localstorage에 저장
+      const response = await fetch("http://127.0.0.1:8000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
+      const data = await response.json();
+      setUserId(data.user_id);
+      navigate("/home");
     } catch (err) {
       console.error(err);
       if (err.message.includes("wrong-password")) {
