@@ -1,27 +1,30 @@
 import React, { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import { Bar } from "react-chartjs-2";
+import { Button, Box, Text, Flex } from "@chakra-ui/react";
 import DiaryChart from "./Chart";
 import { getUserJournals } from "../api/user";
+import { getUserId } from "../localstorage/user";
+import { useNavigate } from "react-router-dom";
 
 const DiaryMock = () => {
-  // Mock 데이터: 유저가 작성한 날짜
-  const [journals, setJournals] = useState([]); // 서버에서 가져온 일기 데이터
-  const [loading, setLoading] = useState(true); // 로딩 상태
-  const [mockDates, setMockDates] = useState([]); // 작성된 날짜
+  const [mockDates, setMockDates] = useState([]); // 작성된 날짜 배열
+  const [journals, setJournals] = useState([]);
   const [mockRatings, setMockRatings] = useState({}); // 날짜별 척도
+  const [loading, setLoading] = useState(true); // 로딩 상태
+  const [menu, setMenu] = useState(1);
 
-  // 서버에서 일기 데이터 가져오기
+  const Navigate = useNavigate();
+
+  // API에서 데이터 가져오기
   const fetchJournals = async () => {
     try {
-      const userJournals = await getUserJournals("user");
+      const userJournals = await getUserJournals(getUserId());
       setJournals(userJournals);
 
       // 일기 작성 날짜만 추출
       const dates = userJournals.map((journal) => journal.date);
       setMockDates(dates);
-      console.log(dates);
 
       // 날짜와 척도를 매핑해서 객체 생성
       const ratings = {};
@@ -30,25 +33,25 @@ const DiaryMock = () => {
       });
       setMockRatings(ratings);
     } catch (error) {
-      alert("일기를 불러오는 중 오류가 발생했습니다.");
+      console.error("일기를 불러오는 중 오류가 발생했습니다.", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchJournals();
+    fetchJournals(); // 컴포넌트 로드 시 데이터 가져오기
   }, []);
 
-  // 캘린더의 tileClassName을 이용하여 특정 날짜에 스타일 추가
+  // 캘린더의 특정 날짜에 스타일 적용
   const tileClassName = ({ date, view }) => {
     if (view === "month") {
-      const dateString = date.toISOString().split("T")[0];
+      const dateString = date.toISOString().split("T")[0]; // YYYY-MM-DD 형식으로 변환
       if (mockDates.includes(dateString)) {
-        return "highlight-circle"; // 작성된 날짜에 동그라미 스타일 추가
+        return "highlight-circle"; // 해당 날짜에 스타일 적용
       }
     }
-    return ""; // 나머지 날짜는 기본 스타일
+    return ""; // 기본 스타일
   };
 
   // 차트 데이터 준비
@@ -67,35 +70,79 @@ const DiaryMock = () => {
 
   return (
     <div style={{ padding: "20px", maxWidth: "400px", margin: "auto" }}>
-      <h3>이달의 기록</h3>
-      {/* 캘린더 */}
-      <Calendar
-        tileClassName={tileClassName} // 특정 날짜를 표시하는 스타일 적용
-        view="month" // 월 단위 보기
-        defaultValue={new Date(2024, 11, 1)} // 2024년 12월로 설정
-        minDetail="month" // 연, 월 상세만 보여줌
-      />
-      <DiaryChart chartData={chartData} />
+      {loading ? (
+        <p>데이터를 불러오는 중입니다...</p>
+      ) : (
+        <>
+          {menu === 1 ? (
+            <>
+              <Calendar
+                tileClassName={tileClassName} // 특정 날짜에 스타일 추가
+                view="month" // 월 단위 보기
+                defaultValue={new Date()} // 현재 날짜로 초기화
+                minDetail="month" // 연, 월 상세만 보여줌
+              />
+              <DiaryChart chartData={chartData} />
+              <Button
+                colorScheme="pink"
+                width="100%"
+                mt={4}
+                onClick={() => setMenu(2)}
+              >
+                내 일기 모두 보기
+              </Button>
+            </>
+          ) : (
+            <>
+              <Flex flexDirection="column" gap={4}>
+                {journals.map((journal, index) => (
+                  <Box
+                    key={index}
+                    border="1px solid #e2e8f0"
+                    borderRadius="md"
+                    padding="16px"
+                    boxShadow="md"
+                    bg="white"
+                  >
+                    <Text fontWeight="bold" fontSize="lg" mb={2}>
+                      {journal.date}
+                    </Text>
+                    <Text fontSize="md" mb={2}>
+                      {journal.content}
+                    </Text>
+                    <Text fontSize="sm" color="gray.500">
+                      Q1: {journal.question1}, Q2: {journal.question2}, Q3:{" "}
+                      {journal.question3}, Q4: {journal.question4}, Q5:{" "}
+                      {journal.question5}
+                    </Text>
+                  </Box>
+                ))}
+              </Flex>
+              <Button
+                colorScheme="blue"
+                width="100%"
+                mt={4}
+                onClick={() => setMenu(1)}
+              >
+                돌아가기
+              </Button>
+            </>
+          )}
+        </>
+      )}
       <style>
         {`
           .highlight-circle {
             background-color: #6c63ff !important; /* 보라색 배경 */
             color: white !important; /* 흰색 텍스트 */
-            border-radius: 50%; /* 동그라미 */
+            border-radius: 50%; /* 동그라미 모양 */
             display: flex;
             justify-content: center;
             align-items: center;
           }
-
           .react-calendar__tile {
             height: 50px; /* 타일 높이 */
             width: 50px; /* 타일 너비 */
-          }
-
-          .react-calendar__tile--now {
-            background: none !important; /* 오늘 날짜 강조 제거 */
-            border: 2px solid #6c63ff; /* 보라색 테두리 */
-            border-radius: 50%; /* 오늘 날짜도 동그라미로 표시 */
           }
         `}
       </style>

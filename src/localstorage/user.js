@@ -4,6 +4,7 @@ const GateUserDefaultKey = {
   _EMAIL: "email",
   _IS_SAVE: "isSaveEmail",
   _USER_ID: "userId",
+  _USER_GOAL: "userGoal",
 };
 
 export const setEmail = (email) => {
@@ -24,25 +25,36 @@ export const setIsSaveEmail = (isSave) => {
 };
 
 export const getIsSaveEmail = () => {
-  const email =
-    (getLocalStorage < boolean) | (null > GateUserDefaultKey._IS_SAVE);
-  return email;
+  const isSave = getLocalStorage(GateUserDefaultKey._IS_SAVE);
+  return isSave;
 };
 
 export const deleteIsSaveEmail = () => {
   removeLocalStorage(GateUserDefaultKey._IS_SAVE);
 };
 
-export const setUserId = (email) => {
-  setLocalStorage(GateUserDefaultKey._USER_ID, email);
+export const setUserId = (userId) => {
+  setLocalStorage(GateUserDefaultKey._USER_ID, userId);
 };
 
 export const getUserId = () => {
-  const email =
-    (getLocalStorage < string) | (null > GateUserDefaultKey._USER_ID);
-  return email;
+  const userId = getLocalStorage(GateUserDefaultKey._USER_ID);
+  return userId;
 };
 
 export const deleteUserId = () => {
   removeLocalStorage(GateUserDefaultKey._USER_ID);
+};
+
+export const setGoal = (goal) => {
+  setLocalStorage(GateUserDefaultKey._USER_GOAL, goal);
+};
+
+export const getGoal = () => {
+  const goal = getLocalStorage(GateUserDefaultKey._USER_GOAL);
+  return goal;
+};
+
+export const deletGoal = () => {
+  removeLocalStorage(GateUserDefaultKey._USER_GOAL);
 };

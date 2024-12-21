@@ -5,22 +5,14 @@ import './App.css';
 import React from 'react';
 import useSize from './component/common/useSize';
 import { extendTheme, ChakraProvider, StyleFunctionProps } from "@chakra-ui/react";
-import {useState, useEffect} from "react";
-import {Routes, Route, useNavigate} from 'react-router-dom';
 
-import { messaging } from './firebase-config';
+import {Routes, Route, useNavigate, useMatch} from 'react-router-dom';
+
+
 import Auth from './pages/Auth';
-import Cookies from 'universal-cookie';
-import {signOut} from 'firebase/auth';
-import {auth, db} from './firebase-config';
 
-import Writing from "./pages/Writing";
-import Loading from "./pages/Loading";
-import DiaryList from "./pages/DiaryList";
-import Signup from "./pages/Signup";
 import Home from "./pages/Home";
-import {doc, getDoc} from "firebase/firestore";
-import { getToken } from 'firebase/messaging';
+
 import TopNav from './component/common/TopNav';
 import BottomNav from './component/common/BottomNav';
 
@@ -34,14 +26,8 @@ import AllDiary from './pages/AllDiary';
 
 function App() {
     const { height } = useSize();
-
-    useEffect(() => {
-      setEmail('hj@naber.com')
-      console.log(getEmail())
-    },[])
-   
-
-   
+    const isAuthenticated = getUserId(); // 로그인 상태 확인
+    const Navigate = useNavigate();
     const styles = {
         global: (props: StyleFunctionProps) => ({
           html: {
@@ -63,11 +49,7 @@ function App() {
         styles,
       });
       
-    const [expanded, setExpanded] = useState(false);
-    const [domLoaded, setDomLoaded] = useState(false);
-    useEffect(() => {
-        setDomLoaded(true);
-    },[])
+
     return (
         
         <ChakraProvider theme={theme}>
@@ -75,26 +57,26 @@ function App() {
             <div className="App">
             <div>
                <TopNav/>
-                <Routes>
-                    <Route path="/" element={
-                        <div>
-                            {/* 로그인 한 상태이면 HOME 으로 그렇지 않으면 Auth 로그인 페이지로 이동 */}
-                            <Auth/>
-                            {/* {isAuth ? ( <><Home userName={userName} userMail={userMail} diaryCount={diaryCount}/><BottomNav number={1} /></>) : (
-                                <Auth setIsAuth={setIsAuth} setUserName={setUserName}/>)} */}
-                        </div>
-                    }/>
-                    <Route path="/home" element={<><Home/><BottomNav number={1} /></>}/>
-                    {/* <Route path="/writing" element={<Writing userName={'Lamda'} userMail={'skku@gmail.com'}/>}/> */}
-                    <Route path="/writing" element={<><Write2/><BottomNav number={2} /></>}/>
-                    <Route path="/list" element={<><DiaryMock/><BottomNav number={3} /></>}/>
-                    <Route path="/alldiary" element={<><AllDiary/><BottomNav number={3} /></>}/>
-              
-                    <Route path="/loading" element={<div><Loading/></div>}/> 
+                  
+              <Routes>
+                {/* 로그인 상태 확인 */}
+                {isAuthenticated ? (
+                  <>
+                    <Route path="/home" element={<><Home /><BottomNav number={1} /></>} />
+                    <Route path="/writing" element={<><Write2 /><BottomNav number={2} /></>} />
+                    <Route path="/list" element={<><DiaryMock /><BottomNav number={3} /></>} />
+                    <Route path="/alldiary" element={<><AllDiary /><BottomNav number={3} /></>} />
+                    {/* 기본 경로를 HOME으로 설정 */}
+                    <Route path="*" element={<Navigate to="/home" replace />} />
+                  </>
+                ) : (
+                  <>
+                    {/* 로그인 상태가 아니면 Auth 페이지로 리다이렉트 */}
+                    <Route path="*" element={<Auth />} />
+                  </>
+                )}
+              </Routes>
 
-                   <Route path="*" element={<div>404~ 없는페이지임</div>}/>
-                    <Route path="/signup" element={<Signup/>}/>
-                </Routes>
             </div>
 
         </div>

@@ -20,17 +20,26 @@ export const signup = async ({ email, password, goal }) => {
   }
 };
 
-/**
- * 새로운 일기를 저장하는 API
- * @param {Object} journal - 저장할 일기 데이터
- * @param {string} journal.userId - 사용자 ID
- * @param {string} journal.content - 일기 내용
- * @param {number} journal.rating - 일기 평가 점수
- * @returns {Promise<Object>} - 서버 응답 데이터
- */
-export const saveJournal = async (journal) => {
+export const saveJournal = async ({
+  userId,
+  content,
+  question1,
+  question2,
+  question3,
+  question4,
+  question5,
+}) => {
   try {
-    const response = await axiosInstance.post("/journals", journal);
+    // 데이터를 JSON 형식으로 전달
+    const response = await axiosInstance.post("/journals", {
+      userId,
+      content,
+      question1,
+      question2,
+      question3,
+      question4,
+      question5,
+    });
     return response.data; // { message, doc_id }
   } catch (error) {
     console.error("Error saving journal:", error);
@@ -50,5 +59,16 @@ export const getUserJournals = async (userId) => {
   } catch (error) {
     console.error("Error fetching user journals:", error);
     throw error; // 에러는 호출한 쪽에서 처리
+  }
+};
+export const login = async ({ email, password }) => {
+  try {
+    const response = await axiosInstance.post("/login", {
+      email,
+      password,
+    });
+    return response.data; // 성공 응답 데이터 반환
+  } catch (err) {
+    throw err; // 에러는 호출한 함수에서 처리하도록 전달
   }
 };

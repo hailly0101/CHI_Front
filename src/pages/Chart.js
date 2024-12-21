@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { getGoal } from "../localstorage/user";
 
 // 필요한 컴포넌트와 스케일 등록
 ChartJS.register(
@@ -25,7 +26,7 @@ const DiaryChart = (chartData) => {
     labels: chartData.labels,
     datasets: [
       {
-        label: "하루 종일 불안해요",
+        label: getGoal(),
         data: [5, 7, 9, 6, 8],
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         borderColor: "rgba(75, 192, 192, 1)",

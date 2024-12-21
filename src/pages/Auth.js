@@ -1,51 +1,27 @@
-import { auth, provider } from "../firebase-config";
-import {
-  signInWithPopup,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  updateProfile,
-} from "firebase/auth";
+import { login } from "../api/user";
 
-import Cookies from "universal-cookie";
 import { useNavigate } from "react-router-dom";
 import { Flex, Text, Box, Input, Button } from "@chakra-ui/react";
 
 import { React, useState } from "react";
 import { ColorSigniture } from "../utils/_Palette";
-import { setUserId } from "../localstorage/user";
+import { setGoal, setUserId } from "../localstorage/user";
 
 export const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [passwordCheck, setPasswordCheck] = useState("");
-  const [username, setUsername] = useState("");
+
   const navigate = useNavigate();
+
   const signInWithEmailPassword = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
-      });
-      const data = await response.json();
+      const data = await login({ email, password });
       setUserId(data.user_id);
+      setGoal(data.goal);
       navigate("/home");
     } catch (err) {
       console.error(err);
-      if (err.message.includes("wrong-password")) {
-        alert(
-          "비밀번호가 틀렸습니다. 비밀번호가 기억나지 않으신다면, taewan@kaist.ac.kr 또는 010-9085-2356으로 연락부탁드립니다."
-        );
-      } else if (err.message.includes("user-not-found")) {
-        alert("계정정보가 없습니다.");
-      } else if (err.message.includes("invalid-email")) {
-        alert("올바른 이메일 형식이 아닙니다.");
-      } else {
-        alert("Error: " + err.message);
-      }
+      alert("Error: 가입된 정보가 없습니다");
     }
   };
 
