@@ -15,5 +15,8 @@ module.exports = {
   rules: {
     "no-unused-vars": "off", // 사용되지 않은 변수 무시
     "no-undef": "off", // 정의되지 않은 변수 경고 무시
+    "no-useless-catch": "off",
+    "react/prop-types": "off",
+    "react/no-unescaped-entities": "off",
   },
 };
