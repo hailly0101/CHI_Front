@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Axios 기본 설정
 const axiosInstance = axios.create({
-  baseURL: "http://127.0.0.1:8000", // 공통 API URL
+  baseURL: "https://expressive-journal-ffd3bd7ddefd.herokuapp.com", // 공통 API URL
   headers: { "Content-Type": "application/json" },
 });
 

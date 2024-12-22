@@ -77,7 +77,7 @@ function DiaryView({ diary, saveDiary }) {
                   style={{
                     backgroundColor: "#FFB284",
                     fontWeight: "600",
-                    marginBottom: "100px",
+                    marginBottom: "10px",
                   }}
                   onClick={() => {
                     saveDiary();

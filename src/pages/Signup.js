@@ -94,7 +94,8 @@ export const Signup = () => {
         ) : (
           <>
             <Text fontSize={"15px"} fontWeight={700} mt="15px">
-              본인이 일기쓰기를 하면서 변화하고 싶은 일상의 목표를 말씀해주세요.
+              마지막으로 본인이 일기쓰기를 할동안 변화하고 싶은 일상의 정신건강
+              목표를 입력해주세요.
             </Text>
             <Textarea
               value={goal}
@@ -111,7 +112,8 @@ export const Signup = () => {
               }}
             />
             <Text fontSize={"15px"} fontWeight={700} mt="15px">
-              ex)불안함을 줄이고 싶어요, 우울감을 감소하고 싶어요
+              ( 00 하기의 양식으로 작성해주세요, ex: 덜 불안해하기, 자책하지
+              말기, 우울감을 감소시키기)
             </Text>
             <Button
               width={"100%"}

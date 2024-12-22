@@ -66,6 +66,7 @@ function App() {
                     <Route path="/writing" element={<><Write2 /><BottomNav number={2} /></>} />
                     <Route path="/list" element={<><DiaryMock /><BottomNav number={3} /></>} />
                     <Route path="/alldiary" element={<><AllDiary /><BottomNav number={3} /></>} />
+                    <Route path="/" element={<><Home /><BottomNav number={1} /></>} />
                     {/* 기본 경로를 HOME으로 설정 */}
                     <Route path="*" element={<Navigate to="/home" replace />} />
                   </>

@@ -70,18 +70,21 @@ const Write2 = () => {
     if (!textInput) return; // Validate user input
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/standalone", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: [...messages, { role: "user", content: textInput }],
-          user: getUserId(),
-          num: "1",
-          turn: messages.length + 1,
-          module: "Main session",
-          model: "gpt-4",
-        }),
-      });
+      const response = await fetch(
+        `https://expressive-journal-ffd3bd7ddefd.herokuapp.com/standalone/${getUserId()}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: [...messages, { role: "user", content: textInput }],
+            user: getUserId(),
+            num: "1",
+            turn: messages.length + 1,
+            module: "Wrapping up",
+            model: "gpt-4",
+          }),
+        }
+      );
       const data = await response.json();
 
       if (data && data.options && data.options.length > 0) {
