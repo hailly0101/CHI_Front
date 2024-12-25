@@ -21,6 +21,7 @@ import DiaryMock from './pages/Result'
 
 import { getEmail, getUserId, setEmail } from './localstorage/user';
 import AllDiary from './pages/AllDiary';
+import Signup from './pages/Signup';
 
 
 
@@ -73,7 +74,8 @@ function App() {
                 ) : (
                   <>
                     {/* 로그인 상태가 아니면 Auth 페이지로 리다이렉트 */}
-                    <Route path="*" element={<Auth />} />
+                    <Route path="/" element={<Auth />} />
+                    <Route path="/signup" element={<Signup />} />
                   </>
                 )}
               </Routes>
