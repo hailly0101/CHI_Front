@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 const Write2 = () => {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
-  // 설문 제출 핸들러
 
   const [responses, setResponses] = useState({
     question1: "",
@@ -22,17 +21,16 @@ const Write2 = () => {
     question5: "",
   });
   const [textInput, setTextInput] = useState(""); // User input
-  const [summary, setSummary] = useState("");
+  const [summary, setSummary] = useState(""); // Summary state
 
   const handleSubmit = () => {
     save();
   };
 
   const save = async () => {
-    // const userId = getUserId();
     const body = {
       userId: getUserId(),
-      content: "오늘은 나에게 있어 매우 피곤한 하루다",
+      content: summary, // Use the summary for the content
       question1: responses.question1,
       question2: responses.question2,
       question3: responses.question3,
@@ -40,34 +38,26 @@ const Write2 = () => {
       question5: responses.question5,
     };
     try {
-      const data = await saveJournal(body);
+      await saveJournal(body);
       alert("오늘의 일기 작성 완료");
       navigate("/list");
     } catch (err) {
       console.log(err);
     }
   };
+
   const [messages, setMessages] = useState([
     {
       role: "assistant",
       content: "안녕하세요! 오늘 하루는 어땠나요?",
     },
-  ]); // Initialize with assistant message
+  ]);
   const [currentMessage, setCurrentMessage] = useState(
     "안녕하세요! 오늘 하루는 어땠나요?"
-  ); // Default message
-  const conversationId = useRef(null); // Ref to store conversation ID
+  );
 
-  useEffect(() => {
-    sendConversationToBackend();
-  }, []);
-
-  const CheckToday = () => {
-    setStep(2);
-  };
-  // Function to send the conversation data to the backend
   const sendConversationToBackend = async () => {
-    if (!textInput) return; // Validate user input
+    if (!textInput) return;
 
     try {
       const response = await fetch(
@@ -88,18 +78,20 @@ const Write2 = () => {
       const data = await response.json();
 
       if (data && data.options && data.options.length > 0) {
-        // Update messages and current message
         setMessages((prevMessages) => [
           ...prevMessages,
           { role: "user", content: textInput },
           { role: "assistant", content: data.options[0] },
         ]);
-        setCurrentMessage(data.options[0]); // Update the assistant's message
-        setTextInput(""); // Clear input field
+        setCurrentMessage(data.options[0]);
+        setTextInput("");
 
         if (data && data.summary) {
-          console.log(summary);
-          setSummary(data.summary);
+          setSummary(data.summary); // Update summary with standalone response
+        }
+
+        if (messages.length >= 2) {
+          sendConversationToDiary(); // Trigger diary summary request
         }
       } else {
         console.error("잘못된 응답: options 필드 없음");
@@ -109,12 +101,39 @@ const Write2 = () => {
     }
   };
 
+  // Function to send conversation summary to the diary endpoint
+  const sendConversationToDiary = async () => {
+    try {
+      const response = await fetch(
+        `https://expressive-journal-ffd3bd7ddefd.herokuapp.com/chat/diary/${getUserId()}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: messages,
+            user: getUserId(),
+            session: "1",
+          }),
+        }
+      );
+
+      const data = await response.json();
+      if (data && data.summary) {
+        setSummary(data.summary); // Update the summary state
+        console.log("Diary Summary: ", data.summary);
+      } else {
+        console.error("잘못된 응답: summary 필드 없음");
+      }
+    } catch (error) {
+      console.error("Error sending message to diary backend:", error);
+    }
+  };
+
   return (
     <>
       {step === 1 ? (
         <Flex flexDir={"column"} mx="16px" flex={1} overflowX="scroll">
           <WriteIntroduceView />
-          {/* Conversation History */}
           <MessageBox messages={messages} />
           <Flex flexDir={"column"}>
             <Flex mt={"10px"} align={"center"}>
@@ -169,14 +188,11 @@ const Write2 = () => {
               }}
             >
               💬 대답하기
-              {/* 💬 Send Response */}
             </Button>
           </Flex>
           {summary !== "" && (
             <>
-              <DiaryView diary={summary} saveDiary={CheckToday} />
-              {/* <Text>{summary}</Text>{" "} */}
-              {/* <Button onClick={() => setStep(2)}>일기 마무리하기</Button> */}
+              <DiaryView diary={summary} saveDiary={() => setStep(2)} />
             </>
           )}
         </Flex>
