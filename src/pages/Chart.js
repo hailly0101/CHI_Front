@@ -22,6 +22,7 @@ ChartJS.register(
 );
 
 const DiaryChart = (chartData) => {
+  console.log(chartData.labels);
   const data = {
     labels: chartData.labels,
     datasets: [

@@ -23,14 +23,16 @@ const DiaryMock = () => {
       setJournals(userJournals);
 
       // 일기 작성 날짜만 추출
-      const dates = userJournals.map((journal) => journal.date);
+      const dates = userJournals.map((journal) => journal.date.slice(0, 10));
+
       setMockDates(dates);
 
       // 날짜와 척도를 매핑해서 객체 생성
       const ratings = {};
       userJournals.forEach((journal) => {
-        ratings[journal.date] = journal.rating;
+        ratings[journal.date] = journal.question3;
       });
+
       setMockRatings(ratings);
     } catch (error) {
       console.error("일기를 불러오는 중 오류가 발생했습니다.", error);
@@ -56,7 +58,7 @@ const DiaryMock = () => {
 
   // 차트 데이터 준비
   const chartData = {
-    labels: Object.keys(mockRatings), // 날짜
+    labels: mockDates, // 날짜
     datasets: [
       {
         label: "일기 척도 (0~10)",
@@ -84,7 +86,8 @@ const DiaryMock = () => {
               />
               <DiaryChart chartData={chartData} />
               <Button
-                colorScheme="pink"
+                backgroundColor="#E79796"
+                color={"white"}
                 width="100%"
                 mt={4}
                 onClick={() => setMenu(2)}
@@ -133,7 +136,7 @@ const DiaryMock = () => {
       <style>
         {`
           .highlight-circle {
-            background-color: #6c63ff !important; /* 보라색 배경 */
+            background-color: #E79796 !important; /* 보라색 배경 */
             color: white !important; /* 흰색 텍스트 */
             border-radius: 50%; /* 동그라미 모양 */
             display: flex;
