@@ -8,6 +8,7 @@ import WriteIntroduceView from "../component/Write/WriteIntroduceVies";
 import MessageBox from "../component/Write/MessageBox";
 import DiaryView from "../component/Write/DiaryView";
 import { useNavigate } from "react-router-dom";
+import LoadingDots from "./LoadingDots";
 
 const Write2 = () => {
   const [step, setStep] = useState(1);
@@ -22,7 +23,7 @@ const Write2 = () => {
   });
   const [textInput, setTextInput] = useState(""); // User input
   const [summary, setSummary] = useState(""); // Summary state
-
+  const [isLoading, setIsLoading] = useState(false); // 로딩 상태 추가
   const handleSubmit = () => {
     save();
   };
@@ -55,9 +56,10 @@ const Write2 = () => {
   const [currentMessage, setCurrentMessage] = useState(
     "안녕하세요! 오늘 하루는 어땠나요?"
   );
-
   const sendConversationToBackend = async () => {
     if (!textInput) return;
+
+    setIsLoading(true); // 로딩 상태 시작
 
     try {
       const response = await fetch(
@@ -98,6 +100,8 @@ const Write2 = () => {
       }
     } catch (error) {
       console.error("Error sending message:", error);
+    } finally {
+      setIsLoading(false); // 로딩 상태 종료
     }
   };
 
@@ -145,9 +149,13 @@ const Write2 = () => {
                 mr="12px"
                 mb="12px"
               />
-              <Text fontWeight={700} fontSize={"14px"}>
-                {currentMessage}
-              </Text>
+              {isLoading ? (
+                <LoadingDots />
+              ) : (
+                <Text fontWeight={700} fontSize={"14px"}>
+                  {currentMessage}
+                </Text>
+              )}
             </Flex>
             <Flex mb={"10px"}>
               <Textarea
