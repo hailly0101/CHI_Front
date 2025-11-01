@@ -16,7 +16,7 @@ function DiaryView({ diary, saveDiary }) {
         <Row>
           <div className="loading_box_2">
             <div>
-              <BeatLoader color="#007AFF" speedMultiplier={0.6} />
+              <BeatLoader color="#3E8D56" speedMultiplier={0.6} />
             </div>
             <span className="desktop-view">
               <Form.Text id="userInput" muted>
@@ -75,9 +75,10 @@ function DiaryView({ diary, saveDiary }) {
                 <Button
                   variant="dark"
                   style={{
-                    backgroundColor: "#FFB284",
+                    backgroundColor: "#3E8D56",
                     fontWeight: "600",
                     marginBottom: "10px",
+                    borderRadius: "10px"
                   }}
                   onClick={() => {
                     saveDiary();
@@ -114,7 +115,7 @@ function DiaryView({ diary, saveDiary }) {
         <div className="d-grid gap-2">
           <Button
             variant="dark"
-            style={{ backgroundColor: "007AFF", fontWeight: "600" }}
+            style={{ backgroundColor: "#3E8D56", fontWeight: "600" }}
             onClick={() => {
               //   editDiary(diaryedit);
               setEditMode(false);

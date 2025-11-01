@@ -5,7 +5,7 @@ const TopNav = () => {
   const navigate = useNavigate();
 
   return (
-    <Flex bg="#F7F2EB" height="80px" align="center" alignItems="center" width={'100%'} onClick={()=>navigate('/')}>
+    <Flex bg="#F1F8F4" height="80px" align="center" alignItems="center" width={'100%'} onClick={()=>navigate('/')} boxShadow="0px 2px 8px rgba(62, 141, 86, 0.08)">
     <Flex alignItems="center"  px={4}>
       {/* 로고 이미지 */}
       <Image
@@ -22,7 +22,7 @@ const TopNav = () => {
         <Text fontSize="xl" fontWeight="bold" color="black" mr='5px'>
           Pocket
         </Text>
-        <Text fontSize="xl" fontWeight="bold" color="pink.400">
+        <Text fontSize="xl" fontWeight="bold" color="#3E8D56">
           Mind-bot
         </Text>
       </Flex>

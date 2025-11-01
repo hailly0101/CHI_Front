@@ -399,7 +399,8 @@ function DiaryList(props) {
                   <Text fontWeight={700} fontSize={'20px'}>피드백 미완료: {unfinishedFeedbackCount}</Text>  
                   {diaryList.map((diary, idx) => (
                     <>
-                        <Flex key={idx} flexDir={'column'}  padding='12px' mb='15px' borderRadius={'10px'} backgroundColor={'#FFFCE0'}>
+                        <Flex key={idx} flexDir={'column'}  padding='15px' mb='15px' borderRadius={'15px'} backgroundColor={'#F1F8F4'} boxShadow="0 2px 8px rgba(62, 141, 86, 0.08)"
+>
                             <Text fontSize={'16px'} fontWeight={700} mb='2px'>{diary.sessionEnd ? Unix_timestamp(diary["sessionEnd"]) : "작성일 없음"}</Text>
                             <Text  fontSize={'14px'} fontWeight={400} mb='5px'> {diary.sessionEnd ? Unix_timestamp2(diary["sessionEnd"]) : "작성 시간 없음"}</Text>
                             {userType === "doctor" && (
@@ -412,10 +413,12 @@ function DiaryList(props) {
                             )}
                               <Button
                                backgroundColor={ColorButtomPink}
+                               color="white"
                                borderRadius={'20px'}
                                fontSize={'15px'}
                                my='10px'
-                               height={'30px'}
+                               height={'35px'}
+                               _hover={{ backgroundColor: "#4FA855" }}
                                onClick={() => handleDiagnosisView(diary.patientEmail, Unix_timestamp_to_YYYYMMDD(diary["sessionEnd"]))}
                              > 이날의 AI 진단 보기</Button>
                              <Text  fontSize={'14px'} fontWeight={500} >{diary["diary"]}</Text>

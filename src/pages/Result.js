@@ -86,10 +86,12 @@ const DiaryMock = () => {
               />
               <DiaryChart chartData={chartData} />
               <Button
-                backgroundColor="#E79796"
+                backgroundColor="#3E8D56"
                 color={"white"}
                 width="100%"
                 mt={4}
+                borderRadius="10px"
+                _hover={{ backgroundColor: "#2E7546" }}
                 onClick={() => setMenu(2)}
               >
                 내 일기 모두 보기
@@ -122,9 +124,12 @@ const DiaryMock = () => {
                 ))}
               </Flex>
               <Button
-                colorScheme="blue"
+                backgroundColor="#3E8D56"
+                color="white"
                 width="100%"
                 mt={4}
+                borderRadius="10px"
+                _hover={{ backgroundColor: "#2E7546" }}
                 onClick={() => setMenu(1)}
               >
                 돌아가기
@@ -136,12 +141,20 @@ const DiaryMock = () => {
       <style>
         {`
           .highlight-circle {
-            background-color: #E79796 !important; /* 보라색 배경 */
+            background-color: #3E8D56 !important; /* 녹색 배경 */
             color: white !important; /* 흰색 텍스트 */
             border-radius: 50%; /* 동그라미 모양 */
             display: flex;
             justify-content: center;
             align-items: center;
+          }
+          .react-calendar__tile--now {
+            background-color: #66BB6A !important; /* 오늘 날짜 밝은 녹색 */
+            border-radius: 50%;
+          }
+          .react-calendar__tile--active {
+            background-color: #3E8D56 !important; /* 선택된 날짜 */
+            color: white !important;
           }
           .react-calendar__tile {
             height: 50px; /* 타일 높이 */

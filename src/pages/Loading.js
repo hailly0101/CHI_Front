@@ -15,7 +15,7 @@ function Loading() {
                         <div className="loading_box">
                             <div>
                                 <ScaleLoader
-                                    color="#007AFF"
+                                    color="#3E8D56"
                                     speedMultiplier={0.9}
                                 />
                             </div>
@@ -46,7 +46,7 @@ function Loading() {
                                     <Button
                                         variant="primary"
                                         disabled={true}
-                                        style={{backgroundColor: "007AFF", fontWeight: "600"}}
+                                        style={{backgroundColor: "#3E8D56", fontWeight: "600"}}
                                     >응답 기록하기</Button>
                                 </div>
                             </Col>

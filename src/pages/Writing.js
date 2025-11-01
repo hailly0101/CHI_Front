@@ -1197,10 +1197,10 @@ function Writing(props) {
                 <br />
               </b>
               {diary}
-              <br /> <br />
+              <br />               <br />
               <Button
                 variant="primary"
-                style={{ backgroundColor: "007AFF", fontWeight: "600" }}
+                style={{ backgroundColor: "#3E8D56", fontWeight: "600" }}
                 onClick={() => {
                   endSession();
                   handleShowDiagnosisModal(); // 모달 열기
@@ -1218,7 +1218,7 @@ function Writing(props) {
               <br />
               <Button
                 variant="primary"
-                style={{ backgroundColor: "007AFF", fontWeight: "600" }}
+                style={{ backgroundColor: "#3E8D56", fontWeight: "600" }}
                 onClick={() => {
                   endSession();
                   handleShowDiagnosisModal(); // 모달 열기
@@ -1333,6 +1333,7 @@ function Writing(props) {
                 backgroundColor={ColorSigniture}
                 color={"white"}
                 borderRadius={"20px"}
+                _hover={{ backgroundColor: "#2E7546" }}
                 onClick={() => {
                   const newSession = String(Math.floor(Date.now() / 1000));
                   setSession(newSession);
@@ -1352,8 +1353,11 @@ function Writing(props) {
                 {existing.map((_, idx) => (
                   <Col key={idx}>
                     <Button
-                      backgroundColor="007AFF"
+                      backgroundColor="#3E8D56"
+                      color="white"
                       fontWeight="400"
+                      borderRadius="10px"
+                      _hover={{ backgroundColor: "#2E7546" }}
                       onClick={() => {
                         const newSession = String(
                           existing[idx]["sessionStart"]
@@ -1400,7 +1404,7 @@ function Writing(props) {
                 <div className="d-grid gap-2">
                   <Button
                     variant="primary"
-                    style={{ backgroundColor: "007AFF", fontWeight: "600" }}
+                    style={{ backgroundColor: "#3E8D56", fontWeight: "600" }}
                     onClick={() => {
                       navigateToReview();
                     }}
@@ -1557,7 +1561,7 @@ function Loading() {
         <Col>
           <div className="loading_box">
             <div>
-              <HashLoader color="#007AFF" speedMultiplier={0.9} />
+              <HashLoader color="#3E8D56" speedMultiplier={0.9} />
             </div>
             &nbsp;
             <div>
